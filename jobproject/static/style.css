@@ -1,0 +1,102 @@
+
+/* Setting the Background image for the homepage */
+.bg-index{
+  background: url("/static/img/homeBackground.png") no-repeat fixed;
+  background-size: 100% auto;
+}
+
+/* white title with black outline */
+.masthead h2 {
+  color: #fff !important;
+  -webkit-text-stroke: 2px #000;
+    text-shadow:
+    1px 1px 0 #000,
+    -1px 1px 0 #000,
+    1px -1px 0 #000,
+    -1px -1px 0 #000,
+    0 1px 0 #000,
+    1px 0 0 #000,
+    0 -1px 0 #000,
+    -1px 0 0 #000;
+  font-weight: 800;
+}
+
+/* subtitle under masthead title */
+.masthead p {
+  color: #fff !important;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+/* Custom navbar styling: blue background and readable link colors */
+.navbar.custom-lightblue, .navbar.custom-lightblue .container-fluid {
+  background-color: #2b6cb0; /* darker blue */
+}
+
+/* Prefer a specific override for the navbar itself (covers when .bg-body-tertiary is present) */
+.navbar.custom-lightblue {
+  background-color: #2b6cb0 !important;
+}
+
+.navbar.custom-lightblue .navbar-brand,
+.navbar.custom-lightblue .nav-link,
+.navbar.custom-lightblue .navbar-toggler {
+  color: #ffffff; /* white for high contrast on darker bg */
+}
+
+/* Navbar toggler icon (hamburger) color for collapsed mobile state */
+.navbar.custom-lightblue .navbar-toggler-icon {
+  filter: invert(100%);
+}
+
+/* Ensuring dropdown menus have readable text on darker background */
+.navbar.custom-lightblue .dropdown-menu {
+  background-color: #255a95;
+}
+
+/* Search button higher contrast on the navbar */
+.navbar.custom-lightblue .btn {
+  border-color: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+/* Footer color and design css */
+.ms-footer {
+  background-color: #202020;
+}
+.ms-footer p {
+  color: #7F7F7F;
+  font-size: 13px;
+}
+.ms-footer a:hover {
+  color: #6ab43e;
+  text-decoration: none;
+}
+.ms-footer-bottom span{
+  font-size: 13px;
+  line-height: 38px;
+}
+.ms-footer-bottom a {
+  color: #6ab43e;
+  text-decoration: none;
+}
+.ms-footer-bottom a:hover {
+  color: #fff;
+}
+
+/* Footer link styles - ensure visibility on dark background */
+.ms-footer .nav-link,
+.ms-footer a,
+.ms-footer h5,
+.ms-footer h6 {
+  color: #ffffff;
+}
+
+.ms-footer .nav-link.p-0 {
+  opacity: 0.95;
+}
+
+/* Small spacing tweak for footer elements */
+.ms-footer .mb-0 {
+  margin-bottom: 0 !important;
+}
