@@ -1,0 +1,24 @@
+
+<div class="col-md-6 col-lg-4">
+  <div class="card h-100 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">{{ job.title }}</h5>
+      <p class="card-text">
+        <strong>Skills:</strong> {{ job.skills|linebreaksbr }}
+      </p>
+      <ul class="list-unstyled mb-3">
+        <li><strong>Location:</strong> {{ job.location }}</li>
+        <li><strong>Salary:</strong> ${{ job.salary }}</li>
+        <li>
+          <strong>Remote:</strong>
+          {% if job.is_remote %} ✅ Yes {% else %} ❌ No {% endif %}
+        </li>
+        <li>
+          <strong>Visa Sponsorship:</strong>
+          {% if job.visa_sponsorship %} ✅ Available {% else %} ❌ Not available {% endif %}
+        </li>
+      </ul>
+      <a href="#" class="btn btn-primary w-100">Apply Now</a>
+    </div>
+  </div>
+</div>
