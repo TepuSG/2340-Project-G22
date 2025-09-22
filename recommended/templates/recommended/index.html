@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+	<h1 class="mb-3">Recommended Jobs</h1>
+
+	<form method="post" class="mb-4">
+		{% csrf_token %}
+		<div class="input-group">
+			<input type="text" name="skills" class="form-control" placeholder="Enter skills, e.g. python, django" value="{{ skills|default:'' }}">
+			<button class="btn btn-primary" type="submit">Find Jobs</button>
+		</div>
+	</form>
+
+	{% if jobs %}
+		<div class="list-group">
+			{% for job in jobs %}
+				<div class="list-group-item">
+					<div class="d-flex w-100 justify-content-between">
+						<h5 class="mb-1">{{ job.title }}</h5>
+						<small>${{ job.salary }}</small>
+					</div>
+					<p class="mb-1 text-muted">{{ job.skills }}</p>
+					<small class="text-muted">{{ job.location }}{% if job.is_remote %} • Remote{% endif %}{% if job.visa_sponsorship %} • Visa sponsorship{% endif %}</small>
+				</div>
+			{% endfor %}
+		</div>
+	{% elif skills %}
+		<div class="alert alert-warning">No matches for "{{ skills }}". Try different keywords.</div>
+	{% else %}
+		<p class="text-muted">Enter your skills above to get job recommendations.</p>
+	{% endif %}
+
+</div>
+{% endblock content %}
+
