@@ -1,0 +1,59 @@
+<!-- Sidebar filter section -->
+<div class="col-md-3">
+    <div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Filter Jobs</h5>
+        <form method="get" action="{% url 'jobs.filters' %}">
+        <!-- Title -->
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ request.GET.title }}">
+        </div>
+
+        <!-- Skills -->
+        <div class="mb-3">
+            <label for="skills" class="form-label">Skills</label>
+            <input type="text" class="form-control" id="skills" name="skills" value="{{ request.GET.skills }}">
+        </div>
+
+        <!-- Location -->
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ request.GET.location }}">
+        </div>
+
+            <!-- Salary Range -->
+            <div class="mb-3">
+                <label for="min_salary" class="form-label">Minimum Salary</label>
+                <input type="number" class="form-control" id="min_salary" name="min_salary" value="{{ request.GET.min_salary }}">
+            </div>
+            <div class="mb-3">
+                <label for="max_salary" class="form-label">Maximum Salary</label>
+                <input type="number" class="form-control" id="max_salary" name="max_salary" value="{{ request.GET.max_salary }}">
+            </div>
+
+        <!-- Remote/On-site -->
+        <div class="mb-3">
+            <label class="form-label">Remote / On-site</label>
+            <select class="form-select" name="remote">
+            <option value="">Any</option>
+            <option value="true" {% if request.GET.remote == "true" %}selected{% endif %}>Remote</option>
+            <option value="false" {% if request.GET.remote == "false" %}selected{% endif %}>On-site</option>
+            </select>
+        </div>
+
+        <!-- Visa Sponsorship -->
+        <div class="mb-3">
+            <label class="form-label">Visa Sponsorship</label>
+            <select class="form-select" name="visa">
+            <option value="">Any</option>
+            <option value="true" {% if request.GET.visa == "true" %}selected{% endif %}>Available</option>
+            <option value="false" {% if request.GET.visa == "false" %}selected{% endif %}>Not Available</option>
+            </select>
+        </div>
+
+        <button type="submit"  class="btn btn-primary w-100">Apply Filters</button>
+        </form>
+    </div>
+    </div>
+</div>

@@ -49,9 +49,24 @@
   filter: invert(100%);
 }
 
-/* Ensuring dropdown menus have readable text on darker background */
+/* Dropdown menus: lighter background with slightly darker hover for items */
 .navbar.custom-lightblue .dropdown-menu {
-  background-color: #255a95;
+  background-color: #e9f3fb; /* light blue */
+  color: #083356; /* dark text for readability */
+}
+
+.navbar.custom-lightblue .dropdown-item {
+  color: #000000; /* dark navy text */
+}
+
+.navbar.custom-lightblue .dropdown-item:hover,
+.navbar.custom-lightblue .dropdown-item:focus {
+  background-color: hsl(198, 69%, 39%); /* slightly darker on hover */
+  color: #ffffff;
+}
+
+.navbar.custom-lightblue .dropdown-divider {
+  border-color: rgba(2,34,58,0.08);
 }
 
 /* Search button higher contrast on the navbar */
