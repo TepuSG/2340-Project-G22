@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'recommended',
     'accounts',
     'jobs',
+    'application',
 ]
 
 MIDDLEWARE = [

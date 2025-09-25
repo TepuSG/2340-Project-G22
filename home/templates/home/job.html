@@ -18,7 +18,7 @@
           {% if job.visa_sponsorship %} ✅ Available {% else %} ❌ Not available {% endif %}
         </li>
       </ul>
-      <a href="#" class="btn btn-primary w-100">Apply Now</a>
+      <a href="{% url 'apply_to_job' job.id %}" class="btn btn-primary w-100">Apply Now</a>
     </div>
   </div>
 </div>

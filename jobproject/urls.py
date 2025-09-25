@@ -23,5 +23,6 @@ urlpatterns = [
     path('recommended/', include('recommended.urls')),
     path('accounts/', include('accounts.urls')),
     path('jobs/', include('jobs.urls')),
+    path('application/', include('application.urls')),
     
 ]
