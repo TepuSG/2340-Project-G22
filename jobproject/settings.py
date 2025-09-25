@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'accounts',
     'jobs',
     'application',
+    'mapbox_location_field',
+    'jobmap',
+
 ]
 
 MIDDLEWARE = [
@@ -127,6 +130,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MAPBOX_KEY = "pk.eyJ1Ijoic2FtdWVsZ2FseXNoIiwiYSI6ImNtZnp1aXlhbzA2amIybG9yaGp4dGVjODIifQ.jrTDRV67UtvzllABcKqVOA" 
 
 STATICFILES_DIRS = [
     BASE_DIR / 'jobproject/static/',

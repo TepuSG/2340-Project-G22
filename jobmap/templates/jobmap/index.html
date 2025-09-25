@@ -1,0 +1,82 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container p-4">
+  <h2>Job Map</h2>
+  <p>Map showing job locations. Markers are added by geocoding job addresses client-side.</p>
+  <div id="map" style="height: 600px; width: 100%; border: 1px solid #ddd; margin-top: 1rem;"></div>
+</div>
+
+<!-- Mapbox GL JS -->
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+
+<script>
+  // Log token for debugging (remove in production)
+  const MAPBOX_KEY = "{{ MAPBOX_KEY }}";
+  console.log('Mapbox Token:', MAPBOX_KEY);
+  
+  mapboxgl.accessToken = MAPBOX_KEY;
+
+  try {
+    console.log('Initializing map...');
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [-98.5795, 39.8283], // USA
+      zoom: 3
+    });
+
+    map.on('style.load', () => {
+      console.log('Map style loaded successfully');
+    });
+
+    map.on('error', (e) => {
+      console.error('Map error:', e);
+    });
+
+    // Add navigation controls
+    map.addControl(new mapboxgl.NavigationControl());
+
+    console.log('Map initialization complete');
+  } catch (e) {
+    console.error('Map initialization error:', e);
+  }
+
+  const jobs = JSON.parse('{{ jobs_json|escapejs }}');
+  console.log('Jobs data:', jobs);  // Debug log
+
+  // Geocode each job location and add a marker
+  async function addJobMarkers() {
+    const geocodeBase = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
+
+    for (const job of jobs) {
+      const query = encodeURIComponent(job.location);
+      const url = `${geocodeBase}${query}.json?access_token=${MAPBOX_KEY}&limit=1`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (data.features && data.features.length > 0) {
+          const [lng, lat] = data.features[0].center;
+          const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+            `<strong>${job.title}</strong><br>${job.location}`
+          );
+
+          new mapboxgl.Marker()
+            .setLngLat([lng, lat])
+            .setPopup(popup)
+            .addTo(map);
+        }
+      } catch (e) {
+        console.error('Geocode error for', job.location, e);
+      }
+    }
+  }
+
+  map.on('load', () => {
+    addJobMarkers();
+  });
+</script>
+{% endblock content %}
