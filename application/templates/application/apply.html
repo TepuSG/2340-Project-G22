@@ -1,6 +1,25 @@
-<h2>Apply to {{ job.title }}</h2>
-<form method="post">
+{% extends "base.html" %}
+{% block content %}
+<header class="masthead bg-index text-center py-4">
+  <div class="container d-flex align-items-center flex-column pt-2">
+    <h2>Job Finder</h2>
+    <p>Your best friend in the Job Search</p>
+  </div>
+</header>
+<div class="p-3">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col mx-auto text-center mb-3">
+        <h4>Apply to {{ job.title }}</h4>
+      </div>
+    </div>
+  </div>
+  <div class="container text-center mb-3">
+    <p class="text-muted">To apply to this position, click "Apply Now." If you have any notes, leave them in the box.</p>
+  </div>
+<form class="text-center py-4" method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Apply Now</button>
+  <button type="button" class="btn btn-success">Apply Now</button>
 </form>
+{% endblock content %}
