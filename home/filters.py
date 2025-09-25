@@ -11,6 +11,11 @@ class TitleFitler(Filterable):
         qs = qs.filter(title__icontains=value)
         return qs
 
+class skillFitler(Filterable):
+    def apply_filter(self, qs, skills):
+        qs = qs.filter(skills__icontains=skills)
+        return qs
+
 class LocationFilter(Filterable):
     def apply_filter(self, qs, value):
         qs = qs.filter(location__icontains=value)
@@ -44,6 +49,7 @@ class FilterOrchestrator:
     filter_registry = {
         'search': TitleFitler,
         'title': TitleFitler,
+        'skills': skillFitler,
         'location': LocationFilter,
         'min_salary': MinSalaryFilter,
         'max_salary': MaxSalaryFilter,

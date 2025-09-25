@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'application',
     'mapbox_location_field',
     'jobmap',
-
 ]
 
 MIDDLEWARE = [
