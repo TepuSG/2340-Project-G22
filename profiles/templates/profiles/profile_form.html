@@ -59,8 +59,9 @@
       {% endfor %}
     </div>
     <button type="button" id="add-link" class="btn btn-secondary btn-sm mb-3">Add link</button>
-      <!-- hidden template for empty experience form -->
+      <!-- hidden templates for empty forms -->
       <template id="exp-empty">{{ exp_fs.empty_form.as_p|safe }}</template>
+      <template id="link-empty">{{ link_fs.empty_form.as_p|safe }}</template>
 
     <div class="mt-3">
       <button type="submit" class="btn btn-primary">Save</button>
@@ -76,8 +77,6 @@ function cloneForm(containerSelector, emptyFormHtml, totalFormsInputName) {
   const idx = parseInt(totalInput.value, 10);
   const newHtml = emptyFormHtml.replace(/__prefix__/g, idx);
   const wrapper = document.createElement('div');
-      <!-- hidden template for empty link form -->
-      <template id="link-empty">{{ link_fs.empty_form.as_p|safe }}</template>
   wrapper.className = 'card mb-2';
   wrapper.innerHTML = '<div class="card-body">' + newHtml + '<button type="button" class="btn btn-danger btn-sm remove-row">Remove</button></div>';
   container.appendChild(wrapper);
@@ -112,28 +111,16 @@ function initAddRemove(emptyPrefixSelector, addButtonSelector, containerSelector
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // inject hidden empty forms (Django formset empty_form)
-  // create temporary containers to hold empty_form HTML
-  const eduEmpty = document.createElement('div');
-  eduEmpty.style.display = 'none';
-  eduEmpty.innerHTML = `{{ edu_fs.empty_form.as_p|escapejs }}`;
-  document.body.appendChild(eduEmpty);
-  const expEmpty = document.createElement('div');
-  expEmpty.style.display = 'none';
-  expEmpty.innerHTML = `{{ exp_fs.empty_form.as_p|escapejs }}`;
-  document.body.appendChild(expEmpty);
-  const linkEmpty = document.createElement('div');
-  linkEmpty.style.display = 'none';
-  linkEmpty.innerHTML = `{{ link_fs.empty_form.as_p|escapejs }}`;
-  document.body.appendChild(linkEmpty);
+  // Use <template> elements already present in the DOM for empty form HTML
+  const eduTemplate = document.querySelector('#edu-empty');
+  const expTemplate = document.querySelector('#exp-empty');
+  const linkTemplate = document.querySelector('#link-empty');
 
-  initAddRemove(null, '#add-edu', '#educations', 'educations-TOTAL_FORMS');
-  initAddRemove(null, '#add-exp', '#experiences', 'experiences-TOTAL_FORMS');
-  initAddRemove(null, '#add-link', '#links', 'links-TOTAL_FORMS');
+  initAddRemove('#edu-empty', '#add-edu', '#educations', 'educations-TOTAL_FORMS');
+  initAddRemove('#exp-empty', '#add-exp', '#experiences', 'experiences-TOTAL_FORMS');
+  initAddRemove('#link-empty', '#add-link', '#links', 'links-TOTAL_FORMS');
 });
 </script>
-{% endblock %}
-
 <style>
 /* Hide Django formset delete checkbox and its label so users use the Remove button instead */
 .card input[type="checkbox"][name$='-DELETE'],
