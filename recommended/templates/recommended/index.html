@@ -3,7 +3,8 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-3">Recommended Jobs</h1>
-
+	{% if user.is_authenticated %}
+	
     {% if jobs %}
         <div class="row g-4">
             {% for job in jobs %}
