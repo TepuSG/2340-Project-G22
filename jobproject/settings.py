@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'home',
     'recommended',
     'accounts',
+    'profiles',
     'jobs',
     'application',
     'mapbox_location_field',

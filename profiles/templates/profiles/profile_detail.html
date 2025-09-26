@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ profile.user.username }}</h2>
+<p>{{ profile.headline }}</p>
+{% if profile.show_skills %}
+  <h4>Skills</h4>
+  <ul>{% for s in profile.skills_list %}<li>{{ s }}</li>{% empty %}<li>No skills listed</li>{% endfor %}</ul>
+{% endif %}
+{% if profile.show_education %}
+  <h4>Education</h4>
+  <ul>{% for e in profile.educations.all %}<li>{{ e.school }} — {{ e.degree }}</li>{% empty %}<li>No education listed</li>{% endfor %}</ul>
+{% endif %}
+{% if profile.show_experience %}
+  <h4>Experience</h4>
+  <ul>{% for x in profile.experiences.all %}<li>{{ x.title }} @ {{ x.company }}</li>{% empty %}<li>No experience listed</li>{% endfor %}</ul>
+{% endif %}
+{% if profile.show_links %}
+  <h4>Links</h4>
+  <ul>{% for l in profile.links.all %}<li><a href="{{ l.url }}">{{ l.label }}</a></li>{% empty %}<li>No links</li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

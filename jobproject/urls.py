@@ -25,5 +25,6 @@ urlpatterns = [
     path('jobs/', include('jobs.urls')),
     path('application/', include('application.urls')),
     path('jobmap/', include('jobmap.urls')),
+    path('profiles/', include('profiles.urls')),
     
 ]
