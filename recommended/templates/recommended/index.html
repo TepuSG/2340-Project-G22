@@ -5,37 +5,38 @@
     <h1 class="mb-3">Recommended Jobs</h1>
 	{% if user.is_authenticated %}
 	
-    {% if jobs %}
-        <div class="row g-4">
-            {% for job in jobs %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ job.title }}</h5>
-                            <p class="card-text">
-                                <strong>Skills:</strong> {{ job.skills|linebreaksbr }}
-                            </p>
-                            <ul class="list-unstyled mb-3">
-                                <li><strong>Location:</strong> {{ job.location }}</li>
-                                <li><strong>Salary:</strong> ${{ job.salary }}</li>
-                                <li>
-                                    <strong>Remote:</strong>
-                                    {% if job.is_remote %} ✅ Yes {% else %} ❌ No {% endif %}
-                                </li>
-                                <li>
-                                    <strong>Visa Sponsorship:</strong>
-                                    {% if job.visa_sponsorship %} ✅ Available {% else %} ❌ Not available {% endif %}
-                                </li>
-                            </ul>
-                            <a href="{% url 'apply_to_job' job.id %}" class="btn btn-primary mt-auto w-100">Apply Now</a> 
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="text-muted">No jobs match your profile skills yet.</p>
-    {% endif %}
+		{% if jobs %}
+			<div class="row g-4">
+				{% for job in jobs %}
+					<div class="col-md-6 col-lg-4">
+						<div class="card h-100 shadow-sm">
+							<div class="card-body d-flex flex-column">
+								<h5 class="card-title">{{ job.title }}</h5>
+								<p class="card-text">
+									<strong>Skills:</strong> {{ job.skills|linebreaksbr }}
+								</p>
+								<ul class="list-unstyled mb-3">
+									<li><strong>Location:</strong> {{ job.location }}</li>
+									<li><strong>Salary:</strong> ${{ job.salary }}</li>
+									<li>
+										<strong>Remote:</strong>
+										{% if job.is_remote %} ✅ Yes {% else %} ❌ No {% endif %}
+									</li>
+									<li>
+										<strong>Visa Sponsorship:</strong>
+										{% if job.visa_sponsorship %} ✅ Available {% else %} ❌ Not available {% endif %}
+									</li>
+								</ul>
+								<a href="{% url 'apply_to_job' job.id %}" class="btn btn-primary mt-auto w-100">Apply Now</a> 
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		{% else %}
+			<p class="text-muted">No jobs match your profile skills yet.</p>
+		{% endif %}
+	{% endif %}
 </div>
 {% endblock content %}
 
