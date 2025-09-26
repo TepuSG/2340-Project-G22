@@ -1,23 +1,130 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Edit Profile</h2>
-<form method="post">{% csrf_token %}
-  {{ form.as_p }}
-  <h3>Education</h3>
-  {{ edu_fs.management_form }}
-  {% for f in edu_fs %}
-    <div class="edu-form">{{ f.as_p }}</div>
-  {% endfor %}
-  <h3>Experience</h3>
-  {{ exp_fs.management_form }}
-  {% for f in exp_fs %}
-    <div class="exp-form">{{ f.as_p }}</div>
-  {% endfor %}
-  <h3>Links</h3>
-  {{ link_fs.management_form }}
-  {% for f in link_fs %}
-    <div class="link-form">{{ f.as_p }}</div>
-  {% endfor %}
-  <button type="submit" class="btn btn-primary">Save</button>
-</form>
+<div class="container mt-4">
+  <h2>Edit Profile</h2>
+  <form method="post" id="profile-form">{% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Headline</label>
+      {{ form.headline }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Skills (comma-separated)</label>
+      {{ form.skills }}
+      <div class="form-text">Enter skills separated by commas, e.g. Python, Django, SQL</div>
+    </div>
+
+    <hr />
+    <h4>Education</h4>
+    <div id="educations">
+      {{ edu_fs.management_form }}
+      {% for f in edu_fs %}
+        <div class="card mb-2 edu-row">
+          <div class="card-body">
+            {{ f.as_p }}
+            <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-edu" class="btn btn-secondary btn-sm mb-3">Add education</button>
+
+    <hr />
+    <h4>Experience</h4>
+    <div id="experiences">
+      {{ exp_fs.management_form }}
+      {% for f in exp_fs %}
+        <div class="card mb-2 exp-row">
+          <div class="card-body">
+            {{ f.as_p }}
+            <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-exp" class="btn btn-secondary btn-sm mb-3">Add experience</button>
+
+    <hr />
+    <h4>Links</h4>
+    <div id="links">
+      {{ link_fs.management_form }}
+      {% for f in link_fs %}
+        <div class="card mb-2 link-row">
+          <div class="card-body">
+            {{ f.as_p }}
+            <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <button type="button" id="add-link" class="btn btn-secondary btn-sm mb-3">Add link</button>
+
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</div>
+
+<script>
+// Utility to clone an empty form template and update indices
+function cloneForm(containerSelector, emptyFormHtml, totalFormsInputName) {
+  const container = document.querySelector(containerSelector);
+  const totalInput = document.querySelector(`input[name="${totalFormsInputName}"]`);
+  const idx = parseInt(totalInput.value, 10);
+  const newHtml = emptyFormHtml.replace(/__prefix__/g, idx);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'card mb-2';
+  wrapper.innerHTML = '<div class="card-body">' + newHtml + '<button type="button" class="btn btn-danger btn-sm remove-row">Remove</button></div>';
+  container.appendChild(wrapper);
+  totalInput.value = idx + 1;
+}
+
+function initAddRemove(emptyPrefixSelector, addButtonSelector, containerSelector, totalFormsName) {
+  const emptyForm = document.querySelector(emptyPrefixSelector);
+  if (!emptyForm) return;
+  const emptyHtml = emptyForm.innerHTML;
+  document.querySelector(addButtonSelector).addEventListener('click', function() {
+    cloneForm(containerSelector, emptyHtml, totalFormsName);
+  });
+  // delegate remove
+  document.querySelector(containerSelector).addEventListener('click', function(e) {
+    if (e.target && e.target.matches('.remove-row')) {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      // If the form contains a DELETE input, mark it instead of removing DOM so Django processes deletions
+      const deleteInput = card.querySelector('input[type=checkbox][name$="-DELETE"][style]') || card.querySelector('input[type=checkbox][name$="-DELETE"]');
+      if (deleteInput) {
+        deleteInput.checked = true;
+        card.style.display = 'none';
+      } else {
+        card.remove();
+        // decrement total forms
+        const total = document.querySelector(`input[name="${totalFormsName}"]`);
+        total.value = parseInt(total.value, 10) - 1;
+      }
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // inject hidden empty forms (Django formset empty_form)
+  // create temporary containers to hold empty_form HTML
+  const eduEmpty = document.createElement('div');
+  eduEmpty.style.display = 'none';
+  eduEmpty.innerHTML = `{{ edu_fs.empty_form.as_p|escapejs }}`;
+  document.body.appendChild(eduEmpty);
+  const expEmpty = document.createElement('div');
+  expEmpty.style.display = 'none';
+  expEmpty.innerHTML = `{{ exp_fs.empty_form.as_p|escapejs }}`;
+  document.body.appendChild(expEmpty);
+  const linkEmpty = document.createElement('div');
+  linkEmpty.style.display = 'none';
+  linkEmpty.innerHTML = `{{ link_fs.empty_form.as_p|escapejs }}`;
+  document.body.appendChild(linkEmpty);
+
+  initAddRemove(null, '#add-edu', '#educations', 'educations-TOTAL_FORMS');
+  initAddRemove(null, '#add-exp', '#experiences', 'experiences-TOTAL_FORMS');
+  initAddRemove(null, '#add-link', '#links', 'links-TOTAL_FORMS');
+});
+</script>
+
 {% endblock %}
