@@ -3,6 +3,15 @@
 <div class="container mt-4">
   <h2>Edit Profile</h2>
   <form method="post" id="profile-form">{% csrf_token %}
+    <div class="mb-3 d-flex align-items-center justify-content-between">
+      <div>
+        <strong>{{ request.user.username }}</strong>
+      </div>
+      <div class="form-check">
+        {{ form.is_public }}
+        <label class="form-check-label" for="id_is_public">Make profile public</label>
+      </div>
+    </div>
     <div class="mb-3">
       <label class="form-label">Headline</label>
       {{ form.headline }}
