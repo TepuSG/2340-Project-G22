@@ -42,6 +42,8 @@
       {% endfor %}
     </div>
     <button type="button" id="add-exp" class="btn btn-secondary btn-sm mb-3">Add experience</button>
+      <!-- hidden template for empty education form -->
+      <template id="edu-empty">{{ edu_fs.empty_form.as_p|safe }}</template>
 
     <hr />
     <h4>Links</h4>
@@ -57,6 +59,8 @@
       {% endfor %}
     </div>
     <button type="button" id="add-link" class="btn btn-secondary btn-sm mb-3">Add link</button>
+      <!-- hidden template for empty experience form -->
+      <template id="exp-empty">{{ exp_fs.empty_form.as_p|safe }}</template>
 
     <div class="mt-3">
       <button type="submit" class="btn btn-primary">Save</button>
@@ -72,6 +76,8 @@ function cloneForm(containerSelector, emptyFormHtml, totalFormsInputName) {
   const idx = parseInt(totalInput.value, 10);
   const newHtml = emptyFormHtml.replace(/__prefix__/g, idx);
   const wrapper = document.createElement('div');
+      <!-- hidden template for empty link form -->
+      <template id="link-empty">{{ link_fs.empty_form.as_p|safe }}</template>
   wrapper.className = 'card mb-2';
   wrapper.innerHTML = '<div class="card-body">' + newHtml + '<button type="button" class="btn btn-danger btn-sm remove-row">Remove</button></div>';
   container.appendChild(wrapper);
@@ -126,5 +132,14 @@ document.addEventListener('DOMContentLoaded', function() {
   initAddRemove(null, '#add-link', '#links', 'links-TOTAL_FORMS');
 });
 </script>
+{% endblock %}
+
+<style>
+/* Hide Django formset delete checkbox and its label so users use the Remove button instead */
+.card input[type="checkbox"][name$='-DELETE'],
+.card label[for$='-DELETE'] {
+  display: none !important;
+}
+</style>
 
 {% endblock %}
