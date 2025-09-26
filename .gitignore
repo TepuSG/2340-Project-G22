@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+env/
+ENV/
+.venv/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+*.log
+
+# Pytest
+.cache/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+
+# Byte-compiled / build artifacts
+build/
+dist/
+
+# Coverage
+htmlcov/
+.coverage
+
+# Misc
+*.swp
+
+# Local env files
+.env.local
+.env.*.local
+
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore pip cache (if accidentally committed)
+pip-log.txt
+
+# Logs
+logs/
+*.log
+
+# Ignore migrations compiled caches (but keep migrations themselves)
+**/migrations/__pycache__/
+
+# Keep project-specific exceptions here
+# For example: !/some-folder/keep_me
