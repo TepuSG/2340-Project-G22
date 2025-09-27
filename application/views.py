@@ -10,7 +10,6 @@ from django.db import IntegrityError
 def apply_to_job(request, id):
     job = get_object_or_404(Job, id=id)
 
-    # Check if the user already applied
     if Application.objects.filter(job=job, job_seeker=request.user).exists():
         messages.warning(request, f"You have already applied to {job.title}.")
         return redirect('jobs.index')
@@ -21,9 +20,19 @@ def apply_to_job(request, id):
             application = form.save(commit=False)
             application.job = job
             application.job_seeker = request.user
+            application.status = "applied"   # ensure it starts here
             application.save()
-            return redirect("jobs.index")  # or wherever you want
+            messages.success(request, f"You applied to {job.title}.")
+            return redirect("jobs.index")
     else:
         form = ApplicationForm()
 
     return render(request, "application/apply.html", {"form": form, "job": job})
+
+
+
+@login_required
+def my_applications(request):
+    applications = Application.objects.filter(job_seeker=request.user).select_related("job")
+    return render(request, "application/my_applications.html", {"applications": applications})
+

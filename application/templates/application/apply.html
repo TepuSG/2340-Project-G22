@@ -17,9 +17,9 @@
   <div class="container text-center mb-3">
     <p class="text-muted">To apply to this position, click "Apply Now." If you have any notes, leave them in the box.</p>
   </div>
-<form class="text-center py-4" method="post">
+<form class="text-center py-4" method="post" action="{% url 'apply_to_job' job.id %}">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="button" class="btn btn-success">Apply Now</button>
+  <button type="submit" class="btn btn-success">Apply Now</button>
 </form>
 {% endblock content %}

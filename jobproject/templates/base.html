@@ -52,6 +52,7 @@
                   <li><a class="dropdown-item" href="{% url 'accounts.signup' %}">Sign Up</a></li>
                   {% if user.is_authenticated %}
                     <li><a class="dropdown-item" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a></li>
+                    <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
                   {% else %}
                     <li><a class="dropdown-item" href="{% url 'accounts.login' %}">Login</a></li>
                   {% endif %}
