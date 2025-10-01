@@ -1,12 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
 from .forms import CustomUserCreationForm, CustomErrorList
-from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
+
 @login_required
 def logout(request):
     auth_logout(request)
     return redirect('home.index')
+
 def login(request):
     template_data = {}
     template_data['title'] = 'Login'
@@ -26,20 +27,24 @@ def login(request):
         else:
             auth_login(request, user)
             return redirect('home.index')
+
+
 def signup(request):
     template_data = {}
     template_data['title'] = 'Sign Up'
-    if request.method == 'GET':
-        template_data['form'] = CustomUserCreationForm()
-        return render(request, 'accounts/signup.html',
-            {'template_data': template_data})
-    elif request.method == 'POST':
-        form = CustomUserCreationForm(request.POST, error_class = CustomErrorList)
+    print('sing up')
+    if request.method == 'POST':
+        print('posted')
+        # Pass the custom error class when instantiating the form on POST
+        form = CustomUserCreationForm(request.POST, error_class=CustomErrorList)
         if form.is_valid():
-            form.save()
+            print('form valid')
+            form.save() # This now correctly saves the user and their role
+            # You might want to add a success message here
             return redirect('accounts.login')
         else:
             template_data['form'] = form
-            return render(request, 'accounts/signup.html',
-                {'template_data': template_data})
-# Create your views here.
+    else: # This handles the GET request
+        template_data['form'] = CustomUserCreationForm(error_class=CustomErrorList)
+    print('rendering the form', template_data)
+    return render(request, 'accounts/signup.html', {'template_data': template_data})

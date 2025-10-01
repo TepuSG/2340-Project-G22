@@ -4,6 +4,47 @@
 <div class="container p-4">
   <h2>Job Map</h2>
   <p>Map showing job locations. Markers are added by geocoding job addresses client-side.</p>
+  <!-- Form Column -->
+  <div class="col-md-3">
+    <h4>Your Preferences</h4>
+    <hr>
+
+  {% if user.is_authenticated and user.is_seeker %}
+  <!-- This form is displayed only to authenticated users -->
+  <!-- It passes the user's ID to the update_distance URL -->
+  <form method="POST" action="{% url 'jobmap.update_distance'%}">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="id_preferred_distance" class="form-label">
+        <strong>Preferred Distance (miles)</strong>
+      </label>
+      <input 
+        type="number" 
+        name="preferred_distance" 
+        class="form-control" 
+        id="id_preferred_distance" 
+        value="{{ user.distance }}"
+        placeholder="e.g. 25"
+        required 
+      />
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Update Map</button>
+  </form>
+
+  {% else %}
+      <!-- This content is shown to unauthenticated (guest) users -->
+      <div class="text-center p-4 border rounded bg-light">
+          <p class="h5 mb-3">Sign up to get personalized results!</p>
+          <p>Create an account to save your preferred distance and see jobs tailored for you.</p>
+          <div class="d-grid gap-2 mt-4">
+              <!-- Make sure you have URLs named 'signup' and 'login' in your urls.py -->
+              <a href="#" class="btn btn-success">Sign Up</a>
+              <a href="#" class="btn btn-secondary">Log In</a>
+          </div>
+      </div>
+  {% endif %}
+
+  </div>
   <div id="map" style="height: 600px; width: 100%; border: 1px solid #ddd; margin-top: 1rem;"></div>
 </div>
 

@@ -39,13 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'mapbox_location_field',
     'home',
     'recommended',
     'accounts',
     'profiles',
     'jobs',
     'application',
-    'mapbox_location_field',
     'jobmap',
 ]
 
@@ -90,6 +90,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'accounts.CustomUser' # 'app_name.ModelName'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
