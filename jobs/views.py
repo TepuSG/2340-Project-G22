@@ -1,5 +1,7 @@
-from django.shortcuts import render
-from home.models import Job
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import JobForm
+from .models import Job
 
 
 def available_jobs(request):
@@ -20,3 +22,23 @@ def filters(request):
     template_data['jobs'] = jobs
 
     return render(request, 'jobs/index.html', {'template_data': template_data})
+
+
+
+@login_required
+def post_job(request):
+    # Only allow recruiters
+    if not request.user.is_recruiter:
+        return redirect('home')  # or return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = JobForm(request.POST)
+        if form.is_valid():
+            job = form.save(commit=False)   # don't save yet
+            job.recruiter = request.user    # assign logged-in recruiter
+            job.save()                      # now save
+            return redirect('jobs')  # redirect after posting
+    else:
+        form = JobForm()
+
+    return render(request, 'jobs/post_job.html', {'form': form})

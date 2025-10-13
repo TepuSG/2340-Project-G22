@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from home.models import Job  # wherever your Job model lives
+from jobs.models import Job  # wherever your Job model lives
 from .forms import ApplicationForm
 from django.contrib import messages
 from .models import Application

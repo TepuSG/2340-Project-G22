@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.conf import settings
-from home.models import Job
+from jobs.models import Job
 from django.db import models
 from mapbox_location_field.models import LocationField
 from accounts.decorators import seeker_required

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from home.models import Job
+from jobs.models import Job
 
 
 # Create your views here.

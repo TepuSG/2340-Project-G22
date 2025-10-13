@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from home.models import Job
+from jobs.models import Job
 
 class Application(models.Model):
     STATUS_CHOICES = [

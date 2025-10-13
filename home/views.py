@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Job
+from jobs.models import Job
 
 def index(request, **kwargs):
     template_data = {}
