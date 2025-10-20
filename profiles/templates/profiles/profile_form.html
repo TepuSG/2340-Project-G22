@@ -1,162 +1,262 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<div class="container mt-4">
-  <h2>Edit Profile</h2>
-  <form method="post" id="profile-form">{% csrf_token %}
-    <div class="mb-3 d-flex align-items-center justify-content-between">
-      <div>
-        <strong>{{ request.user.username }}</strong>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+      <div class="card shadow-sm">
+        <div class="card-body p-4 p-md-5">
+          <h2 class="card-title text-center mb-4">Edit Your Profile</h2>
+          <form method="post" id="profile-form">
+            {% csrf_token %}
+
+            <!-- Main Profile Section -->
+            <div class="p-3 mb-4 bg-light rounded-3 border">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">
+                  <i class="fas fa-user-circle me-2 text-primary"></i>{{ request.user.username }}
+                </h4>
+                <div class="form-check form-switch">
+                  {{ form.is_public }}
+                  <label class="form-check-label" for="{{ form.is_public.id_for_label }}">Make profile public</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="{{ form.headline.id_for_label }}" class="form-label">Headline</label>
+                {{ form.headline }}
+              </div>
+              <div class="mb-3">
+                <label for="{{ form.skills.id_for_label }}" class="form-label">Skills</label>
+                {{ form.skills }}
+                <div class="form-text">Enter skills separated by commas (e.g., Python, Django, SQL).</div>
+              </div>
+            </div>
+
+            <!-- Formsets with Accordion -->
+            <div class="accordion" id="profile-formsets">
+              <!-- Education -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-edu">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-edu" aria-expanded="true" aria-controls="collapse-edu">
+                    <i class="fas fa-graduation-cap me-2"></i>Education
+                  </button>
+                </h2>
+                <div id="collapse-edu" class="accordion-collapse collapse show" aria-labelledby="heading-edu">
+                  <div class="accordion-body">
+                    <div id="educations">
+                      {{ edu_fs.management_form }}
+                      {% for form in edu_fs %}
+                        <div class="formset-row card mb-3">
+                          <div class="card-body">
+                            {{ form.id }}
+                            <div class="row g-2">
+                              <div class="col-md-6">{{ form.school.label_tag }} {{ form.school }}</div>
+                              <div class="col-md-6">{{ form.degree.label_tag }} {{ form.degree }}</div>
+                              <div class="col-md-6">{{ form.start_year.label_tag }} {{ form.start_year }}</div>
+                              <div class="col-md-6">{{ form.end_year.label_tag }} {{ form.end_year }}</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-row">Remove</button>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <button type="button" id="add-edu" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i>Add Education</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Experience -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-exp">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-exp" aria-expanded="false" aria-controls="collapse-exp">
+                    <i class="fas fa-briefcase me-2"></i>Experience
+                  </button>
+                </h2>
+                <div id="collapse-exp" class="accordion-collapse collapse" aria-labelledby="heading-exp">
+                  <div class="accordion-body">
+                    <div id="experiences">
+                      {{ exp_fs.management_form }}
+                      {% for form in exp_fs %}
+                        <div class="formset-row card mb-3">
+                          <div class="card-body">
+                            {{ form.id }}
+                            <div class="row g-2">
+                              <div class="col-md-6">{{ form.company.label_tag }} {{ form.company }}</div>
+                              <div class="col-md-6">{{ form.title.label_tag }} {{ form.title }}</div>
+                              <div class="col-md-6">{{ form.start_year.label_tag }} {{ form.start_year }}</div>
+                              <div class="col-md-6">{{ form.end_year.label_tag }} {{ form.end_year }}</div>
+                              <div class="col-12">{{ form.description.label_tag }} {{ form.description }}</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-row">Remove</button>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <button type="button" id="add-exp" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i>Add Experience</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Links -->
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-links">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-links" aria-expanded="false" aria-controls="collapse-links">
+                    <i class="fas fa-link me-2"></i>Links
+                  </button>
+                </h2>
+                <div id="collapse-links" class="accordion-collapse collapse" aria-labelledby="heading-links">
+                  <div class="accordion-body">
+                    <div id="links">
+                      {{ link_fs.management_form }}
+                      {% for form in link_fs %}
+                        <div class="formset-row card mb-3">
+                          <div class="card-body">
+                            {{ form.id }}
+                            <div class="row g-2">
+                              <div class="col-md-6">{{ form.label.label_tag }} {{ form.label }}</div>
+                              <div class="col-md-6">{{ form.url.label_tag }} {{ form.url }}</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-row">Remove</button>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                    <button type="button" id="add-link" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i>Add Link</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visibility Toggles -->
+            <div class="mt-4 p-3 bg-light rounded-3 border">
+                <h5 class="mb-3">Section Visibility</h5>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check form-switch">{{ form.show_skills }} <label for="{{ form.show_skills.id_for_label }}" class="form-check-label">Show Skills</label></div>
+                    <div class="form-check form-switch">{{ form.show_education }} <label for="{{ form.show_education.id_for_label }}" class="form-check-label">Show Education</label></div>
+                    <div class="form-check form-switch">{{ form.show_experience }} <label for="{{ form.show_experience.id_for_label }}" class="form-check-label">Show Experience</label></div>
+                    <div class="form-check form-switch">{{ form.show_links }} <label for="{{ form.show_links.id_for_label }}" class="form-check-label">Show Links</label></div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary btn-lg px-5">Save Profile</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="form-check">
-        {{ form.is_public }}
-        <label class="form-check-label" for="id_is_public">Make profile public</label>
-      </div>
     </div>
-    <div class="mb-3">
-      <label class="form-label">Headline</label>
-      {{ form.headline }}
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Skills (comma-separated)</label>
-      {{ form.skills }}
-      <div class="form-text">Enter skills separated by commas, e.g. Python, Django, SQL</div>
-    </div>
-    
-    <div class="form-check">
-      {{ form.show_skills }}
-      <label class="form-check-label" for="id_show_skills">Show Skills</label>
-    </div>
-
-    <hr />
-    <h4>Education</h4>
-    <div id="educations">
-      {{ edu_fs.management_form }}
-      {% for f in edu_fs %}
-        <div class="card mb-2 edu-row">
-          <div class="card-body">
-            {{ f.as_p }}
-            <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-    <button type="button" id="add-edu" class="btn btn-secondary btn-sm mb-3">Add education</button>
-
-
-    <div class="form-check">
-      {{ form.show_education }}
-      <label class="form-check-label" for="id_show_education">Show Education</label>
-    </div>
-
-    <hr />
-    <h4>Experience</h4>
-    <div id="experiences">
-      {{ exp_fs.management_form }}
-      {% for f in exp_fs %}
-        <div class="card mb-2 exp-row">
-          <div class="card-body">
-            {{ f.as_p }}
-            <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-    <button type="button" id="add-exp" class="btn btn-secondary btn-sm mb-3">Add experience</button>
-      <!-- hidden template for empty education form -->
-      <template id="edu-empty">{{ edu_fs.empty_form.as_p|safe }}</template>
-
-      <div class="form-check">
-      {{ form.show_experience }}
-      <label class="form-check-label" for="id_show_experience">Show Experience</label>
-    </div>
-
-    <hr />
-    <h4>Links</h4>
-    <div id="links">
-      {{ link_fs.management_form }}
-      {% for f in link_fs %}
-        <div class="card mb-2 link-row">
-          <div class="card-body">
-            {{ f.as_p }}
-            <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-    <button type="button" id="add-link" class="btn btn-secondary btn-sm mb-3">Add link</button>
-      <!-- hidden templates for empty forms -->
-      <template id="exp-empty">{{ exp_fs.empty_form.as_p|safe }}</template>
-      <template id="link-empty">{{ link_fs.empty_form.as_p|safe }}</template>
-
-      <div class="form-check mb-3">
-      {{ form.show_links }}
-      <label class="form-check-label" for="id_show_links">Show Links</label>
-    </div>
-
-    <div class="mt-3">
-      <button type="submit" class="btn btn-primary">Save</button>
-    </div>
-  </form>
+  </div>
 </div>
 
+<!-- Hidden templates for empty forms -->
+<template id="edu-empty">{{ edu_fs.empty_form.as_p|safe }}</template>
+<template id="exp-empty">{{ exp_fs.empty_form.as_p|safe }}</template>
+<template id="link-empty">{{ link_fs.empty_form.as_p|safe }}</template>
+
 <script>
-// Utility to clone an empty form template and update indices
-function cloneForm(containerSelector, emptyFormHtml, totalFormsInputName) {
-  const container = document.querySelector(containerSelector);
-  const totalInput = document.querySelector(`input[name="${totalFormsInputName}"]`);
-  const idx = parseInt(totalInput.value, 10);
-  const newHtml = emptyFormHtml.replace(/__prefix__/g, idx);
-  const wrapper = document.createElement('div');
-  wrapper.className = 'card mb-2';
-  wrapper.innerHTML = '<div class="card-body">' + newHtml + '<button type="button" class="btn btn-danger btn-sm remove-row">Remove</button></div>';
-  container.appendChild(wrapper);
-  totalInput.value = idx + 1;
-}
-
-function initAddRemove(emptyPrefixSelector, addButtonSelector, containerSelector, totalFormsName) {
-  const emptyForm = document.querySelector(emptyPrefixSelector);
-  if (!emptyForm) return;
-  const emptyHtml = emptyForm.innerHTML;
-  document.querySelector(addButtonSelector).addEventListener('click', function() {
-    cloneForm(containerSelector, emptyHtml, totalFormsName);
-  });
-  // delegate remove
-  document.querySelector(containerSelector).addEventListener('click', function(e) {
-    if (e.target && e.target.matches('.remove-row')) {
-      const card = e.target.closest('.card');
-      if (!card) return;
-      // If the form contains a DELETE input, mark it instead of removing DOM so Django processes deletions
-      const deleteInput = card.querySelector('input[type=checkbox][name$="-DELETE"][style]') || card.querySelector('input[type=checkbox][name$="-DELETE"]');
-      if (deleteInput) {
-        deleteInput.checked = true;
-        card.style.display = 'none';
-      } else {
-        card.remove();
-        // decrement total forms
-        const total = document.querySelector(`input[name="${totalFormsName}"]`);
-        total.value = parseInt(total.value, 10) - 1;
-      }
-    }
-  });
-}
-
+// ... (JavaScript for adding/removing formset rows remains the same)
 document.addEventListener('DOMContentLoaded', function() {
-  // Use <template> elements already present in the DOM for empty form HTML
-  const eduTemplate = document.querySelector('#edu-empty');
-  const expTemplate = document.querySelector('#exp-empty');
-  const linkTemplate = document.querySelector('#link-empty');
+  function cloneForm(container, emptyFormHtml, totalFormsInput) {
+    const idx = parseInt(totalFormsInput.value, 10);
+    const newHtml = emptyFormHtml.replace(/__prefix__/g, idx);
+    
+    const newRow = document.createElement('div');
+    newRow.className = 'formset-row card mb-3';
+    newRow.innerHTML = `<div class="card-body">${newHtml}<button type="button" class="btn btn-sm btn-outline-danger mt-2 remove-row">Remove</button></div>`;
+    
+    // Manually structure the new form fields
+    const cardBody = newRow.querySelector('.card-body');
+    const p_tags = Array.from(cardBody.querySelectorAll('p'));
+    const id_input = cardBody.querySelector('input[type=hidden]');
+    
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'row g-2';
+
+    p_tags.forEach(p => {
+        const label = p.querySelector('label');
+        const input = p.querySelector('input, textarea, select');
+        if (label && input) {
+            const colDiv = document.createElement('div');
+            // Assign column width based on field type
+            if (input.type === 'textarea' || input.name.includes('school') || input.name.includes('degree') || input.name.includes('company') || input.name.includes('title')) {
+                colDiv.className = 'col-14';
+            } else {
+                colDiv.className = 'col-md-6';
+            }
+            colDiv.appendChild(label);
+            colDiv.appendChild(input);
+            rowDiv.appendChild(colDiv);
+        }
+    });
+
+    // Clear the original <p> tags and append the structured row
+    p_tags.forEach(p => p.remove());
+    if (id_input) cardBody.insertBefore(id_input, cardBody.firstChild);
+    cardBody.insertBefore(rowDiv, cardBody.querySelector('.remove-row'));
+
+    container.appendChild(newRow);
+    totalFormsInput.value = idx + 1;
+  }
+
+  function initAddRemove(templateId, addButtonId, containerId, totalFormsName) {
+    const template = document.querySelector(templateId);
+    const addButton = document.querySelector(addButtonId);
+    const container = document.querySelector(containerId);
+    const totalFormsInput = document.querySelector(`input[name="${totalFormsName}"]`);
+
+    if (!template || !addButton || !container || !totalFormsInput) return;
+
+    const emptyHtml = template.innerHTML;
+
+    addButton.addEventListener('click', function() {
+      cloneForm(container, emptyHtml, totalFormsInput);
+    });
+
+    container.addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-row')) {
+        const row = e.target.closest('.formset-row');
+        const deleteInput = row.querySelector('input[type=checkbox][name$="-DELETE"]');
+        if (deleteInput) {
+          deleteInput.checked = true;
+          row.style.display = 'none';
+        } else {
+          row.remove();
+          totalFormsInput.value = parseInt(totalFormsInput.value, 10) - 1;
+        }
+      }
+    });
+  }
 
   initAddRemove('#edu-empty', '#add-edu', '#educations', 'educations-TOTAL_FORMS');
   initAddRemove('#exp-empty', '#add-exp', '#experiences', 'experiences-TOTAL_FORMS');
   initAddRemove('#link-empty', '#add-link', '#links', 'links-TOTAL_FORMS');
 });
 </script>
-<style>
-/* Hide Django formset delete checkbox and its label so users use the Remove button instead */
-.card input[type="checkbox"][name$='-DELETE'],
-.card label[for$='-DELETE'] {
-  display: none !important;
-}
-</style>
 
+<style>
+  /* Custom styles for a cleaner form */
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.8rem;
+  }
+  .accordion-button {
+    font-size: 1.1rem;
+  }
+  .formset-row .card-body {
+    position: relative;
+  }
+  .formset-row .remove-row {
+    position: relative;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  .form-check-label {
+    cursor: pointer;
+  }
+  /* Hide Django's default delete checkbox and label */
+  .formset-row input[type="checkbox"][name$='-DELETE'],
+  .formset-row label[for$='-DELETE'] {
+    display: none !important;
+  }
+</style>
 {% endblock %}

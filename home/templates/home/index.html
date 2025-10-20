@@ -12,9 +12,45 @@
       <div class="col mx-auto text-center mb-3">
         <h4>Welcome to WorkFlow! Here is where you can find your Dream Job!</h4>
         <p>Use the search bar above to filter jobs by title, skills, location, salary, remote/on-site, and visa sponsorship.</p>
-        <p class="mt-3">
-          <a class="btn btn-primary" href="{% url 'jobs.index' %}">Browse Jobs</a>
-        </p>
+      </div>
+    </div>
+    
+    <!-- Navigation Cards -->
+    <div class="row text-center mt-4">
+      <!-- Sign In Card -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <img src="https://via.placeholder.com/300x200.png?text=Sign+In" class="card-img-top" alt="Sign In">
+          <div class="card-body">
+            <h5 class="card-title">Get Started</h5>
+            <p class="card-text">Sign in to your account to manage your profile and applications.</p>
+            <a href="{% url 'accounts.login' %}" class="btn btn-primary">Sign In</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Job Search Card -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <img src="https://via.placeholder.com/300x200.png?text=Job+Search" class="card-img-top" alt="Job Search">
+          <div class="card-body">
+            <h5 class="card-title">Find Your Next Job</h5>
+            <p class="card-text">Browse countless job listings to find the perfect fit for you.</p>
+            <a href="{% url 'jobs.index' %}" class="btn btn-primary">Search Jobs</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recommendations Card -->
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <img src="https://via.placeholder.com/300x200.png?text=Recommendations" class="card-img-top" alt="Recommendations">
+          <div class="card-body">
+            <h5 class="card-title">Personalized Recommendations</h5>
+            <p class="card-text">Get job recommendations based on your skills and profile.</p>
+            <a href="{% url 'recommended.index' %}" class="btn btn-primary">View Recommendations</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
