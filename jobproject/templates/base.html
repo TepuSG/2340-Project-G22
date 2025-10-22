@@ -52,12 +52,16 @@
                   <li><a class="dropdown-item" href="{% url 'accounts.signup' %}">Sign Up</a></li>
                   {% if user.is_authenticated %}
                     <li><a class="dropdown-item" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a></li>
-                    <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
-                  {% else %}
+                    {% else %}
                     <li><a class="dropdown-item" href="{% url 'accounts.login' %}">Login</a></li>
-                  {% endif %}
+                    {% endif %}
+                    {% if user.is_seeker %}
+                      <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
+                    {% endif %}
                 </ul>
               </li>
+
+          {% if request.user.is_authenticated and request.user.is_seeker %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Look for Jobs
@@ -75,6 +79,12 @@
                 <li><a class="dropdown-item" href="{% url 'jobmap.index' %}">Job Map</a></li>
               </ul>
             </li>
+          {% endif %}
+              {% if request.user.is_authenticated and request.user.is_recruiter %}
+                <a href="{% url 'post_job' %}" class="btn btn-primary" style="margin-left: 10px;">
+                    Post Job
+                </a>
+              {% endif %}
              </ul>
             <form class="d-flex" role="search" action="{% url 'jobs.filters' %}" method="get">
               <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">

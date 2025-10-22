@@ -29,7 +29,7 @@ def filters(request):
 def post_job(request):
     # Only allow recruiters
     if not request.user.is_recruiter:
-        return redirect('home')  # or return HttpResponseForbidden()
+        return redirect('home.index')  # or return HttpResponseForbidden()
 
     if request.method == 'POST':
         form = JobForm(request.POST)
@@ -37,7 +37,7 @@ def post_job(request):
             job = form.save(commit=False)   # don't save yet
             job.recruiter = request.user    # assign logged-in recruiter
             job.save()                      # now save
-            return redirect('jobs')  # redirect after posting
+            return redirect('jobs.index')  # redirect after posting
     else:
         form = JobForm()
 
