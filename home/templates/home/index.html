@@ -16,11 +16,11 @@
     </div>
     
     <!-- Navigation Cards -->
+    {% if not user.is_authenticated %}
+    <!-- First Row - Sign In Card Only (show only when not logged in) -->
     <div class="row text-center mt-4">
-      <!-- Sign In Card -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-          <img src="https://via.placeholder.com/300x200.png?text=Sign+In" class="card-img-top" alt="Sign In">
+      <div class="col-8 mx-auto mb-4">
+        <div class="card h-100 shadow border">
           <div class="card-body">
             <h5 class="card-title">Get Started</h5>
             <p class="card-text">Sign in to your account to manage your profile and applications.</p>
@@ -28,11 +28,14 @@
           </div>
         </div>
       </div>
-      
+    </div>
+    {% endif %}
+    
+    <!-- Second Row - Job Search and Recommendations Cards -->
+    <div class="row text-center {% if not user.is_authenticated %}mt-5{% else %}mt-4{% endif %}">
       <!-- Job Search Card -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-          <img src="https://via.placeholder.com/300x200.png?text=Job+Search" class="card-img-top" alt="Job Search">
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow border">
           <div class="card-body">
             <h5 class="card-title">Find Your Next Job</h5>
             <p class="card-text">Browse countless job listings to find the perfect fit for you.</p>
@@ -42,12 +45,11 @@
       </div>
       
       <!-- Recommendations Card -->
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-          <img src="https://via.placeholder.com/300x200.png?text=Recommendations" class="card-img-top" alt="Recommendations">
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow border">
           <div class="card-body">
             <h5 class="card-title">Personalized Recommendations</h5>
-            <p class="card-text">Get job recommendations based on your skills and profile.</p>
+            <p class="card-text">Find job recommendations based on your skills and profile.</p>
             <a href="{% url 'recommended.index' %}" class="btn btn-primary">View Recommendations</a>
           </div>
         </div>

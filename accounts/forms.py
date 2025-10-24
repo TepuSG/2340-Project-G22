@@ -23,8 +23,8 @@ class CustomErrorList(ErrorList):
 
 class CustomUserCreationForm(UserCreationForm):
     ROLE_CHOICES = (
-        (CustomUser.Roles.SEEKER, 'Sign up as a Seeker'),
-        (CustomUser.Roles.RECRUITER, 'Sign up as a Recruiter'),
+        (CustomUser.Roles.SEEKER, 'Seeker'),
+        (CustomUser.Roles.RECRUITER, 'Recruiter'),
     )
 
     role = forms.ChoiceField(
