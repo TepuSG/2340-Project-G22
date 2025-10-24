@@ -2,50 +2,92 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container p-4">
-  <h2>Job Map</h2>
-  <p>Map showing job locations. Markers are added by geocoding job addresses client-side.</p>
-  <!-- Form Column -->
-  <div class="col-md-3">
-    <h4>Your Preferences</h4>
-    <hr>
+  <h2>Job Map - City-Based Search</h2>
+  <p>Search for jobs within a specified radius of major US cities. Select your preferred city and radius to see relevant job locations.</p>
+  
+  <div class="row">
+    <!-- Form Column -->
+    <div class="col-md-4">
+      <h4>Your Preferences</h4>
+      <hr>
 
-  {% if user.is_authenticated and user.is_seeker %}
-  <!-- This form is displayed only to authenticated users -->
-  <!-- It passes the user's ID to the update_distance URL -->
-  <form method="POST" action="{% url 'jobmap.update_distance'%}">
-    {% csrf_token %}
-    <div class="mb-3">
-      <label for="id_preferred_distance" class="form-label">
-        <strong>Preferred Distance (miles)</strong>
-      </label>
-      <input 
-        type="number" 
-        name="preferred_distance" 
-        class="form-control" 
-        id="id_preferred_distance" 
-        value="{{ user.distance }}"
-        placeholder="e.g. 25"
-        required 
-      />
-    </div>
-    <button type="submit" class="btn btn-primary w-100">Update Map</button>
-  </form>
+      {% if user.is_authenticated and user.is_seeker %}
+      <!-- This form is displayed only to authenticated seekers -->
+      <form method="POST" action="{% url 'jobmap.update_distance'%}">
+        {% csrf_token %}
+        
+        <!-- City Selection -->
+        <div class="mb-3">
+          <label for="id_selected_city" class="form-label">
+            <strong>Select City</strong>
+          </label>
+          <select name="selected_city" class="form-select" id="id_selected_city" required>
+            {% for city_value, city_display in cities_choices %}
+              <option value="{{ city_value }}" 
+                {% if city_preference.selected_city == city_value %}selected{% endif %}>
+                {{ city_display }}
+              </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">Choose a city to center your job search around, or select "N/A" to see all jobs</div>
+        </div>
 
-  {% else %}
-      <!-- This content is shown to unauthenticated (guest) users -->
-      <div class="text-center p-4 border rounded bg-light">
-          <p class="h5 mb-3">Sign up to get personalized results!</p>
-          <p>Create an account to save your preferred distance and see jobs tailored for you.</p>
-          <div class="d-grid gap-2 mt-4">
-              <!-- Make sure you have URLs named 'signup' and 'login' in your urls.py -->
-              <a href="#" class="btn btn-success">Sign Up</a>
-              <a href="#" class="btn btn-secondary">Log In</a>
-          </div>
+        <!-- Distance Selection -->
+        <div class="mb-3">
+          <label for="id_preferred_distance" class="form-label">
+            <strong>Search Radius (miles)</strong>
+          </label>
+          <input 
+            type="number" 
+            name="preferred_distance" 
+            class="form-control" 
+            id="id_preferred_distance" 
+            value="{% if city_preference.radius_miles %}{{ city_preference.radius_miles }}{% endif %}"
+            placeholder="e.g. 25 (leave blank to show all jobs)"
+            min="0"
+            max="5000"
+          />
+          <div class="form-text" id="radius-help-text">Distance in miles from the selected city (leave blank when city is "N/A" to show all jobs)</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="fas fa-search me-2"></i>Update Map
+        </button>
+      </form>
+
+      <!-- Current Settings Display -->
+      {% if city_preference %}
+      <div class="mt-4 p-3 bg-light rounded">
+        <h6>Current Settings:</h6>
+        <p class="mb-1"><strong>City:</strong> {{ city_preference.selected_city }}</p>
+        <p class="mb-0"><strong>Radius:</strong> {{ city_preference.radius_miles }} miles</p>
       </div>
-  {% endif %}
+      {% endif %}
 
+      {% else %}
+      <!-- This content is shown to unauthenticated users -->
+      <div class="text-center p-4 border rounded bg-light">
+        <p class="h5 mb-3">Sign up to get personalized results!</p>
+        <p>Create an account to save your preferred city and search radius for customized job recommendations.</p>
+        <div class="d-grid gap-2 mt-4">
+          <a href="{% url 'accounts.signup' %}" class="btn btn-success">Sign Up</a>
+          <a href="{% url 'accounts.login' %}" class="btn btn-secondary">Log In</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Map Column -->
+    <div class="col-md-8">
+      <div id="map" style="height: 600px; width: 100%; border: 1px solid #ddd; border-radius: 8px;"></div>
+      <div class="mt-2">
+        <small class="text-muted">
+          <i class="fas fa-info-circle me-1"></i>
+          Click on markers to see job details. Jobs are shown within your selected radius.
+        </small>
+      </div>
+    </div>
   </div>
-  <div id="map" style="height: 600px; width: 100%; border: 1px solid #ddd; margin-top: 1rem;"></div>
 </div>
 
 <!-- Mapbox GL JS -->
@@ -53,51 +95,112 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 
 <script>
-  // Minimal token diagnostics (avoid printing the full token in logs)
+  // Configuration
   const MAPBOX_KEY = "{{ MAPBOX_KEY }}";
-  try {
-    console.log('Mapbox token length:', MAPBOX_KEY ? MAPBOX_KEY.length : 0);
-    if (MAPBOX_KEY && !MAPBOX_KEY.startsWith('pk.')) {
-      console.warn('Mapbox token does not start with "pk." and may be invalid.');
-    }
-  } catch (e) {
-    console.warn('Could not inspect MAPBOX_KEY', e);
-  }
+  const jobs = JSON.parse('{{ jobs_json|escapejs }}');
+  const selectedCityCoords = {% if selected_city_coords %}{{ selected_city_coords|safe }}{% else %}null{% endif %};
+  const searchRadius = {% if city_preference and city_preference.radius_miles %}{{ city_preference.radius_miles }}{% else %}null{% endif %};
 
+  console.log('Jobs data count:', Array.isArray(jobs) ? jobs.length : 'unknown');
+  console.log('Selected city coordinates:', selectedCityCoords);
+  console.log('Search radius:', searchRadius, 'miles');
+
+  // Initialize map
   mapboxgl.accessToken = MAPBOX_KEY;
-
-  // Declare `map` in outer scope so other functions can use it.
   let map = null;
 
   try {
-    console.log('Initializing map...');
+    const mapCenter = selectedCityCoords ? [selectedCityCoords.lng, selectedCityCoords.lat] : [-98.5795, 39.8283]; // Default to center of USA
+    const initialZoom = selectedCityCoords ? 8 : 3;
+
     map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-98.5795, 39.8283], // USA
-      zoom: 3
-    });
-
-    map.on('style.load', () => {
-      console.log('Map style loaded successfully');
-    });
-
-    map.on('error', (e) => {
-      console.error('Map error:', e);
+      center: mapCenter,
+      zoom: initialZoom
     });
 
     // Add navigation controls
     map.addControl(new mapboxgl.NavigationControl());
 
-    console.log('Map initialization complete');
+    console.log('Map initialized successfully');
   } catch (e) {
     console.error('Map initialization error:', e);
   }
 
-  const jobs = JSON.parse('{{ jobs_json|escapejs }}');
-  console.log('Jobs data (count):', Array.isArray(jobs) ? jobs.length : 'unknown');
+  // Calculate distance between two points (Haversine formula)
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 3956; // Earth's radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
 
-  // Geocode each job location and add a marker
+  // Add city center marker and radius circle
+  function addCityMarkerAndRadius() {
+    if (!map || !selectedCityCoords) return;
+
+    // Add city center marker
+    const popupText = searchRadius !== null ? 
+      `<div style="text-align: center;">
+        <strong>Search Center</strong><br>
+        {% if city_preference %}{{ city_preference.selected_city }}{% else %}Selected City{% endif %}<br>
+        <small>${searchRadius} mile radius</small>
+      </div>` :
+      `<div style="text-align: center;">
+        <strong>Search Center</strong><br>
+        {% if city_preference %}{{ city_preference.selected_city }}{% else %}Selected City{% endif %}<br>
+        <small>No radius limit</small>
+      </div>`;
+
+    const cityMarker = new mapboxgl.Marker({ color: '#ff0000', scale: 1.2 })
+      .setLngLat([selectedCityCoords.lng, selectedCityCoords.lat])
+      .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupText))
+      .addTo(map);
+
+    // Add radius circle only if radius is specified
+    if (searchRadius !== null) {
+      const center = [selectedCityCoords.lng, selectedCityCoords.lat];
+      const radiusInDegrees = searchRadius / 69; // Rough conversion: 1 degree ≈ 69 miles
+
+      map.on('load', function() {
+        // Add circle source
+        map.addSource('radius-circle', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: center
+            }
+          }
+        });
+
+        // Add circle layer
+        map.addLayer({
+          id: 'radius-circle',
+          type: 'circle',
+          source: 'radius-circle',
+          paint: {
+            'circle-radius': {
+              stops: [[0, 0], [20, radiusInDegrees * 1000]]
+            },
+            'circle-color': '#007cbf',
+            'circle-opacity': 0.1,
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#007cbf',
+            'circle-stroke-opacity': 0.5
+          }
+        });
+      });
+    }
+  }
+
+  // Geocode jobs and add markers for those within radius
   async function addJobMarkers() {
     if (!map) {
       console.warn('Map is not initialized; cannot add markers.');
@@ -105,9 +208,12 @@
     }
 
     const geocodeBase = 'https://api.mapbox.com/geocoding/v5/mapbox.places/';
+    let markersAdded = 0;
+    let markersInRadius = 0;
 
     for (const job of jobs) {
       if (!job.location) continue;
+
       const query = encodeURIComponent(job.location);
       const url = `${geocodeBase}${query}.json?access_token=${MAPBOX_KEY}&limit=1`;
 
@@ -117,17 +223,41 @@
           console.warn('Geocode HTTP error for', job.location, res.status);
           continue;
         }
+
         const data = await res.json();
         if (data.features && data.features.length > 0) {
           const [lng, lat] = data.features[0].center;
-          const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-            `<strong>${job.title}</strong><br>${job.location}`
-          );
 
-          new mapboxgl.Marker()
-            .setLngLat([lng, lat])
-            .setPopup(popup)
-            .addTo(map);
+          // Check if job is within radius (if city is selected and radius is specified)
+          let withinRadius = true;
+          if (selectedCityCoords && searchRadius !== null) {
+            const distance = calculateDistance(
+              selectedCityCoords.lat, selectedCityCoords.lng, lat, lng
+            );
+            withinRadius = distance <= searchRadius;
+            if (withinRadius) markersInRadius++;
+          } else {
+            // No radius limit or no city selected - include all jobs
+            markersInRadius++;
+          }
+
+          if (withinRadius) {
+            const popupContent = `
+              <div style="max-width: 250px;">
+                <strong>${job.title}</strong><br>
+                <small><i class="fas fa-map-marker-alt"></i> ${job.location}</small><br>
+                ${job.salary ? `<small><i class="fas fa-dollar-sign"></i> $${job.salary.toLocaleString()}</small><br>` : ''}
+                ${job.is_remote ? '<span class="badge bg-success">Remote</span>' : '<span class="badge bg-primary">On-site</span>'}
+              </div>
+            `;
+
+            new mapboxgl.Marker({ color: '#28a745' })
+              .setLngLat([lng, lat])
+              .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
+              .addTo(map);
+
+            markersAdded++;
+          }
         } else {
           console.log('No geocode result for', job.location);
         }
@@ -135,12 +265,51 @@
         console.error('Geocode error for', job.location, e);
       }
     }
+
+    console.log(`Added ${markersAdded} job markers`);
+    if (selectedCityCoords) {
+      if (searchRadius !== null) {
+        console.log(`${markersInRadius} jobs within ${searchRadius} miles of selected city`);
+      } else {
+        console.log(`${markersInRadius} jobs shown (no radius limit)`);
+      }
+    }
   }
 
+  // Initialize map content when loaded
   if (map) {
     map.on('load', () => {
+      addCityMarkerAndRadius();
       addJobMarkers();
     });
   }
+
+  // Handle city dropdown change to update radius field behavior
+  document.addEventListener('DOMContentLoaded', function() {
+    const citySelect = document.getElementById('id_selected_city');
+    const radiusInput = document.getElementById('id_preferred_distance');
+    const helpText = document.getElementById('radius-help-text');
+    
+    function updateRadiusField() {
+      const selectedCity = citySelect.value;
+      if (selectedCity === 'N/A') {
+        radiusInput.placeholder = 'Leave blank to show all jobs';
+        radiusInput.value = '';
+        helpText.textContent = 'Leave blank to show all jobs on the map';
+      } else {
+        radiusInput.placeholder = 'e.g. 25';
+        if (!radiusInput.value) {
+          radiusInput.value = '25';
+        }
+        helpText.textContent = 'Distance in miles from the selected city';
+      }
+    }
+    
+    // Update on page load
+    updateRadiusField();
+    
+    // Update when city selection changes
+    citySelect.addEventListener('change', updateRadiusField);
+  });
 </script>
 {% endblock content %}

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from .models import Job
+from jobs.models import Job
 
 class Filterable(ABC):
     @abstractmethod
