@@ -18,7 +18,9 @@
           {% if job.visa_sponsorship %} ✅ Available {% else %} ❌ Not available {% endif %}
         </li>
       </ul>
-        {% if user.is_authenticated %}
+        {% if user.is_recruiter%}
+            <a href="{% url 'edit_job' job.id %}" class="btn btn-primary mt-auto w-100">Edit Job</a>
+        {% elif user.is_authenticated and user.is_seeker%}
             <a href="{% url 'apply_to_job' job.id %}" class="btn btn-primary mt-auto w-100">Apply Now</a>
         {% else %}
               <a href="{% url 'accounts.login' %}?next={% url 'apply_to_job' job.id %}" class="btn btn-primary mt-auto w-100"> Apply Now</a>

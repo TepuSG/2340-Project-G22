@@ -15,6 +15,7 @@ class Job(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
 
     
+    # links the recruiter to the job
     recruiter = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

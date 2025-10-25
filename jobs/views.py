@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.views.generic import UpdateView
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 from .forms import JobForm
 from .models import Job
 
@@ -42,3 +46,23 @@ def post_job(request):
         form = JobForm()
 
     return render(request, 'jobs/post_job.html', {'form': form})
+
+
+
+@method_decorator(login_required, name='dispatch')
+class JobUpdateView(UpdateView):
+    model = Job
+    template_name = 'jobs/edit_job.html'
+    fields = ['title', 'skills', 'location', 'salary', 'is_remote', 'visa_sponsorship']
+    success_url = reverse_lazy('recruiter_jobs')
+
+    def get_queryset(self):
+        # Only allow the logged-in recruiter to edit their own postings
+        return Job.objects.filter(recruiter=self.request.user)
+    
+    
+# displays jobs only posted by the current recruiter
+@login_required
+def recruiter_jobs(request):
+    jobs = Job.objects.filter(recruiter=request.user)
+    return render(request, 'jobs/recruiter_jobs.html', {'jobs': jobs})

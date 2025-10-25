@@ -69,12 +69,25 @@
 
             {% else %}
               <a href="{% url 'accounts.login' %}" class="btn btn-primary">View Recommendations</a>
-            {% endif %}
-
+            {% endif %}{% if user.is_authenticated and user.is_recruiter %}
+          
             
           </div>
         </div>
-      </div>
+      </div>  
+            <!-- Third Row - Recruiter My Jobs Card -->
+            <div class="row text-center mt-4">
+              <div class="col-md-6 mx-auto mb-4">
+                <div class="card h-100 shadow border">
+                  <div class="card-body">
+                    <h5 class="card-title">Manage My Job Postings</h5>
+                    <p class="card-text">View and edit the jobs you’ve posted to find the best candidates.</p>
+                    <a href="{% url 'recruiter_jobs' %}" class="btn btn-primary">View My Jobs</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
     </div>
   </div>
 </div>

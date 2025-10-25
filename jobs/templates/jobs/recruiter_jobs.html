@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>My Job Postings</h2>
+<ul>
+  {% for job in jobs %}
+    <li>
+      {% include 'home/job.html' with job=job %}
+    </li>
+  {% empty %}
+    <p>You haven’t posted any jobs yet.</p>
+  {% endfor %}
+</ul>
+{% endblock %}
+
+
