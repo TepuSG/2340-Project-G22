@@ -21,6 +21,7 @@
 {% endif %}
 
 {% if user.is_recruiter %}
+  <a class="btn btn-secondary mt-3" href="{% url 'recommended.candidate_search' %}">Back to search</a>
   <a class="btn btn-secondary mt-3" href="{% url 'recommended.overview' %}">Back to candidates</a>
 {% endif %}
 </div>
