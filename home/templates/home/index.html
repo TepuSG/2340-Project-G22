@@ -33,13 +33,19 @@
     
     <!-- Second Row - Job Search and Recommendations Cards -->
     <div class="row text-center {% if not user.is_authenticated %}mt-5{% else %}mt-4{% endif %}">
-      <!-- Job Search Card -->
+      <!-- Job Search / Candidate Search Card -->
       <div class="col-md-6 mb-4">
         <div class="card h-100 shadow border">
           <div class="card-body">
-            <h5 class="card-title">Find Your Next Job</h5>
-            <p class="card-text">Browse countless job listings to find the perfect fit for you.</p>
-            <a href="{% url 'jobs.index' %}" class="btn btn-primary">Search Jobs</a>
+            {% if user.is_authenticated and user.is_recruiter %}
+              <h5 class="card-title">Find Candidates</h5>
+              <p class="card-text">Search candidate profiles and filter by skills, location, and projects.</p>
+              <a href="{% url 'recommended.candidate_search' %}" class="btn btn-primary">Find Candidates</a>
+            {% else %}
+              <h5 class="card-title">Find Your Next Job</h5>
+              <p class="card-text">Browse countless job listings to find the perfect fit for you.</p>
+              <a href="{% url 'jobs.index' %}" class="btn btn-primary">Search Jobs</a>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -50,7 +56,7 @@
           <div class="card-body">
             <h5 class="card-title">Personalized Recommendations</h5>
             
-            
+
            {% if user.is_authenticated %}
           {% if user.is_recruiter %}
             {# Recruiters: go to aggregated recommendations overview #}

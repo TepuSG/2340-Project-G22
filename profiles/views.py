@@ -35,3 +35,4 @@ def profile_edit(request):
         exp_fs = ExperienceFormSet(instance=profile)
         link_fs = LinkFormSet(instance=profile)
     return render(request, 'profiles/profile_form.html', {'form': form, 'edu_fs': edu_fs, 'exp_fs': exp_fs, 'link_fs': link_fs})
+
