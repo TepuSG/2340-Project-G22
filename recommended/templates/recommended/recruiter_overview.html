@@ -26,6 +26,9 @@
               {% endif %}
               <p class="mb-1"><strong>Matched skills:</strong> {{ item.matches|join:", " }}</p>
               <p class="mb-0"><strong>Matched jobs:</strong> {{ item.matched_jobs|join:", " }}</p>
+              <div class="mt-3">
+                <a href="{% url 'profiles:detail' item.profile.user.username %}" class="btn btn-sm btn-primary">See profile</a>
+              </div>
             </div>
           </div>
         </div>
