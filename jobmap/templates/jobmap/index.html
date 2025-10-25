@@ -100,7 +100,6 @@
   const jobs = JSON.parse('{{ jobs_json|escapejs }}');
   const selectedCityCoords = {% if selected_city_coords %}{{ selected_city_coords|safe }}{% else %}null{% endif %};
   const searchRadius = {% if city_preference and city_preference.radius_miles %}{{ city_preference.radius_miles }}{% else %}null{% endif %};
-  const selectedCityName = "{% if city_preference %}{{ city_preference.selected_city }}{% else %}Selected City{% endif %}";
 
   console.log('Jobs data count:', Array.isArray(jobs) ? jobs.length : 'unknown');
   console.log('Selected city coordinates:', selectedCityCoords);
