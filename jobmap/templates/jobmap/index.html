@@ -100,6 +100,7 @@
   const jobs = JSON.parse('{{ jobs_json|escapejs }}');
   const selectedCityCoords = {% if selected_city_coords %}{{ selected_city_coords|safe }}{% else %}null{% endif %};
   const searchRadius = {% if city_preference and city_preference.radius_miles %}{{ city_preference.radius_miles }}{% else %}null{% endif %};
+  const selectedCityName = "{% if city_preference %}{{ city_preference.selected_city }}{% else %}Selected City{% endif %}";
 
   console.log('Jobs data count:', Array.isArray(jobs) ? jobs.length : 'unknown');
   console.log('Selected city coordinates:', selectedCityCoords);
@@ -109,9 +110,40 @@
   mapboxgl.accessToken = MAPBOX_KEY;
   let map = null;
 
+  // Function to calculate zoom level based on radius in miles
+  function getZoomForRadius(radiusMiles) {
+    if (!radiusMiles) return 3; // Default zoom for no radius
+    
+    // Convert radius from miles to meters
+    const radiusMeters = radiusMiles * 1609.34;
+    
+    // Assume we want the radius to fit within ~40% of the screen width
+    // Typical screen width is ~1000 pixels, so 400 pixels for radius
+    const targetPixels = 400;
+    
+    // At latitude 40° (mid-US), meters per pixel at zoom 0 ≈ 78,271 meters/pixel
+    // Formula from Mapbox: metersPerPixel = (78271 * cos(latitude)) / 2^zoom
+    // At lat 40°: metersPerPixel ≈ 59,959 / 2^zoom
+    
+    const metersPerPixelAtZoom0 = 59959; // For latitude ~40°
+    
+    // We need: radiusMeters / metersPerPixel = targetPixels
+    // radiusMeters / (59959 / 2^zoom) = targetPixels
+    // radiusMeters * 2^zoom / 59959 = targetPixels
+    // 2^zoom = (targetPixels * 59959) / radiusMeters
+    // zoom = log2((targetPixels * 59959) / radiusMeters)
+    
+    const zoom = Math.log2((targetPixels * metersPerPixelAtZoom0) / radiusMeters);
+    
+    // Clamp between 0 and 22 (Mapbox's valid zoom range)
+    return Math.max(0, Math.min(22, Math.round(zoom)));
+  }
+
   try {
     const mapCenter = selectedCityCoords ? [selectedCityCoords.lng, selectedCityCoords.lat] : [-98.5795, 39.8283]; // Default to center of USA
-    const initialZoom = selectedCityCoords ? 8 : 3;
+    const initialZoom = selectedCityCoords ? getZoomForRadius(searchRadius) : 3;
+
+    console.log(`Setting zoom level ${initialZoom} for radius ${searchRadius} miles`);
 
     map = new mapboxgl.Map({
       container: 'map',
@@ -157,47 +189,10 @@
         <small>No radius limit</small>
       </div>`;
 
-    const cityMarker = new mapboxgl.Marker({ color: '#ff0000', scale: 1.2 })
+    const cityMarker = new mapboxgl.Marker({ color: '#ff0000', scale: 0.8 })
       .setLngLat([selectedCityCoords.lng, selectedCityCoords.lat])
       .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupText))
       .addTo(map);
-
-    // Add radius circle only if radius is specified
-    if (searchRadius !== null) {
-      const center = [selectedCityCoords.lng, selectedCityCoords.lat];
-      const radiusInDegrees = searchRadius / 69; // Rough conversion: 1 degree ≈ 69 miles
-
-      map.on('load', function() {
-        // Add circle source
-        map.addSource('radius-circle', {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: center
-            }
-          }
-        });
-
-        // Add circle layer
-        map.addLayer({
-          id: 'radius-circle',
-          type: 'circle',
-          source: 'radius-circle',
-          paint: {
-            'circle-radius': {
-              stops: [[0, 0], [20, radiusInDegrees * 1000]]
-            },
-            'circle-color': '#007cbf',
-            'circle-opacity': 0.1,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#007cbf',
-            'circle-stroke-opacity': 0.5
-          }
-        });
-      });
-    }
   }
 
   // Geocode jobs and add markers for those within radius
