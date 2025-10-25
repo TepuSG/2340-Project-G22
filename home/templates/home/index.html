@@ -49,8 +49,23 @@
         <div class="card h-100 shadow border">
           <div class="card-body">
             <h5 class="card-title">Personalized Recommendations</h5>
-            <p class="card-text">Find job recommendations based on your skills and profile.</p>
-            <a href="{% url 'recommended.index' %}" class="btn btn-primary">View Recommendations</a>
+            
+            
+           {% if user.is_authenticated %}
+          {% if user.is_recruiter %}
+            {# Recruiters: go to aggregated recommendations overview #}
+            <p class="card-text">Find qualified applicants based on their skills and profile.</p>
+            <a href="{% url 'recommended.overview' %}" class="btn btn-primary">View Candidate Recommendations</a>
+              {% elif user.is_seeker  %}
+                <p class="card-text">Find job recommendations based on your skills and profile.</p>
+                <a href="{% url 'recommended.index' %}" class="btn btn-primary">View Recommendations</a>
+              {% endif %}
+
+            {% else %}
+              <a href="{% url 'accounts.login' %}" class="btn btn-primary">View Recommendations</a>
+            {% endif %}
+
+            
           </div>
         </div>
       </div>

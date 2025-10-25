@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1 class="mb-3">Recommended Candidates</h1>
+
+  <p class="text-muted">Showing candidates that match any skill from your posted jobs.</p>
+
+  {% if not candidates %}
+    <div class="alert alert-info">No matching candidates found or no skills listed on your jobs.</div>
+  {% else %}
+    <div class="row">
+      {% for item in candidates %}
+        <div class="col-12 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">
+                {% if item.profile.user.get_full_name %}
+                  {{ item.profile.user.get_full_name }}
+                {% else %}
+                  {{ item.profile.user.username }}
+                {% endif %}
+              </h5>
+              {% if item.profile.skills %}
+                <p class="mb-1"><strong>Skills:</strong> {{ item.profile.skills }}</p>
+              {% endif %}
+              <p class="mb-1"><strong>Matched skills:</strong> {{ item.matches|join:", " }}</p>
+              <p class="mb-0"><strong>Matched jobs:</strong> {{ item.matched_jobs|join:", " }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock content %}
