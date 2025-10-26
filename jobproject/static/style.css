@@ -20,6 +20,32 @@
   margin-bottom: 0;
 }
 
+
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: #1e3a8a !important;
+  border-color: #1e3a8a !important;
+  color: #ffffff !important;
+}
+
+.text-primary {
+  color: #1e3a8a !important;
+}
+
+.bg-primary {
+  background-color: #1e3a8a !important;
+}
+
+.card-header.bg-primary {
+  background-color: #1e3a8a !important;
+}
+
+.badge.bg-primary {
+  background-color: #1e3a8a !important;
+}
+
 /* Custom navbar styling: blue background and readable link colors */
 .navbar.custom-lightblue, .navbar.custom-lightblue .container-fluid {
   background-color: #2b6cb0; /* darker blue */

@@ -16,10 +16,10 @@
     </div>
     
     <!-- Navigation Cards -->
-    {% if not user.is_authenticated %}
-    <!-- First Row - Sign In Card Only (show only when not logged in) -->
-    <div class="row text-center mt-4">
-      <div class="col-8 mx-auto mb-4">
+    <div class="row text-center mt-4 justify-content-center">
+      <!-- Sign In Card (only show when not logged in) -->
+      {% if not user.is_authenticated %}
+      <div class="col-sm-6 col-md-4 mb-4">
         <div class="card h-100 shadow border">
           <div class="card-body">
             <h5 class="card-title">Get Started</h5>
@@ -28,13 +28,10 @@
           </div>
         </div>
       </div>
-    </div>
-    {% endif %}
-    
-    <!-- Second Row - Job Search and Recommendations Cards -->
-    <div class="row text-center {% if not user.is_authenticated %}mt-5{% else %}mt-4{% endif %}">
+      {% endif %}
+      
       <!-- Job Search / Candidate Search Card -->
-      <div class="col-md-6 mb-4">
+      <div class="{% if not user.is_authenticated %}col-sm-6 col-md-4{% elif user.is_authenticated and user.is_recruiter %}col-sm-6 col-md-4{% else %}col-sm-6 col-md-6{% endif %} mb-4">
         <div class="card h-100 shadow border">
           <div class="card-body">
             {% if user.is_authenticated and user.is_recruiter %}
@@ -51,43 +48,39 @@
       </div>
       
       <!-- Recommendations Card -->
-      <div class="col-md-6 mb-4">
+      <div class="{% if not user.is_authenticated %}col-sm-12 col-md-4{% elif user.is_authenticated and user.is_recruiter %}col-sm-6 col-md-4{% else %}col-sm-6 col-md-6{% endif %} mb-4">
         <div class="card h-100 shadow border">
           <div class="card-body">
             <h5 class="card-title">Personalized Recommendations</h5>
-            
-
-           {% if user.is_authenticated %}
-          {% if user.is_recruiter %}
-            {# Recruiters: go to aggregated recommendations overview #}
-            <p class="card-text">Find qualified applicants based on their skills and profile.</p>
-            <a href="{% url 'recommended.overview' %}" class="btn btn-primary">View Candidate Recommendations</a>
-              {% elif user.is_seeker  %}
+            {% if user.is_authenticated %}
+              {% if user.is_recruiter %}
+                {# Recruiters: go to aggregated recommendations overview #}
+                <p class="card-text">Find qualified applicants based on their skills and profile.</p>
+                <a href="{% url 'recommended.overview' %}" class="btn btn-primary">View Candidate Recommendations</a>
+              {% elif user.is_seeker %}
                 <p class="card-text">Find job recommendations based on your skills and profile.</p>
                 <a href="{% url 'recommended.index' %}" class="btn btn-primary">View Recommendations</a>
               {% endif %}
-
             {% else %}
+              <p class="card-text">Get personalized job recommendations based on your skills and profile.</p>
               <a href="{% url 'accounts.login' %}" class="btn btn-primary">View Recommendations</a>
-            {% endif %}{% if user.is_authenticated and user.is_recruiter %}
-          
-            
+            {% endif %}
           </div>
         </div>
-      </div>  
-            <!-- Third Row - Recruiter My Jobs Card -->
-            <div class="row text-center mt-4">
-              <div class="col-md-6 mx-auto mb-4">
-                <div class="card h-100 shadow border">
-                  <div class="card-body">
-                    <h5 class="card-title">Manage My Job Postings</h5>
-                    <p class="card-text">View and edit the jobs you’ve posted to find the best candidates.</p>
-                    <a href="{% url 'recruiter_jobs' %}" class="btn btn-primary">View My Jobs</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endif %}
+      </div>
+      
+      <!-- Recruiter Job Management Card (only show for authenticated recruiters) -->
+      {% if user.is_authenticated and user.is_recruiter %}
+      <div class="col-sm-12 col-md-4 mb-4">
+        <div class="card h-100 shadow border">
+          <div class="card-body">
+            <h5 class="card-title">Manage My Job Postings</h5>
+            <p class="card-text">View and edit the jobs you've posted to find the best candidates.</p>
+            <a href="{% url 'recruiter_jobs' %}" class="btn btn-primary">View My Jobs</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>

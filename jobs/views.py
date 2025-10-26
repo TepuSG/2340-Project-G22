@@ -65,4 +65,17 @@ class JobUpdateView(UpdateView):
 @login_required
 def recruiter_jobs(request):
     jobs = Job.objects.filter(recruiter=request.user)
-    return render(request, 'jobs/recruiter_jobs.html', {'jobs': jobs})
+    
+    # Calculate statistics
+    total_jobs = jobs.count()
+    remote_jobs = jobs.filter(is_remote=True).count()
+    visa_jobs = jobs.filter(visa_sponsorship=True).count()
+    
+    context = {
+        'jobs': jobs,
+        'total_jobs': total_jobs,
+        'remote_jobs': remote_jobs,
+        'visa_jobs': visa_jobs,
+    }
+    
+    return render(request, 'jobs/recruiter_jobs.html', context)

@@ -1,15 +1,277 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<h2>My Job Postings</h2>
-<ul>
-  {% for job in jobs %}
-    <li>
-      {% include 'home/job.html' with job=job %}
-    </li>
-  {% empty %}
-    <p>You haven’t posted any jobs yet.</p>
-  {% endfor %}
-</ul>
+<div class="container py-5">
+  <!-- Page Header -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="display-5 fw-bold text-primary mb-2">
+            <i class="fas fa-briefcase me-3"></i>My Job Postings
+          </h1>
+          <p class="lead text-muted">Manage and track your job listings</p>
+        </div>
+        <div>
+          <a href="{% url 'post_job' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Post New Job
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Listings -->
+  {% if jobs %}
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="text-dark">
+            <i class="fas fa-th-list me-2 text-primary"></i>Your Job Listings
+          </h3>
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary active" onclick="switchView('grid')">
+              <i class="fas fa-th me-1"></i>Grid
+            </button>
+            <button type="button" class="btn btn-outline-primary" onclick="switchView('list')">
+              <i class="fas fa-list me-1"></i>List
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid View -->
+    <div id="grid-view" class="row">
+      {% for job in jobs %}
+        <div class="col-lg-4 col-md-6 mb-4">
+          <div class="card h-100 shadow-sm border-0 job-card">
+            <div class="card-header bg-light py-3">
+              <div class="d-flex justify-content-between align-items-start">
+                <h5 class="card-title mb-0 text-primary">{{ job.title }}</h5>
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-ellipsis-v"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'edit_job' job.id %}">
+                      <i class="fas fa-edit me-2"></i>Edit Job
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" onclick="confirmDelete('{{ job.title }}', {{ job.id }})">
+                      <i class="fas fa-trash me-2"></i>Delete Job
+                    </a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Job Details -->
+              <div class="mb-3">
+                <div class="row text-center mb-3">
+                  <div class="col-6">
+                    <div class="border-end">
+                      <i class="fas fa-map-marker-alt text-primary"></i>
+                      <small class="d-block text-muted">{{ job.location }}</small>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <i class="fas fa-dollar-sign text-success"></i>
+                    <small class="d-block text-muted">${{ job.salary|floatformat:0 }}</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Skills -->
+              <div class="mb-3">
+                <small class="text-muted fw-semibold">Required Skills:</small>
+                <div class="mt-1">
+                  <span class="badge bg-light text-dark border">{{ job.skills|truncatechars:30 }}</span>
+                </div>
+              </div>
+
+              <!-- Job Features -->
+              <div class="mb-3">
+                <div class="row">
+                  <div class="col-6">
+                    <small class="text-muted d-block">
+                      {% if job.is_remote %}
+                        <i class="fas fa-home text-success me-1"></i>Remote
+                      {% else %}
+                        <i class="fas fa-building text-muted me-1"></i>On-site
+                      {% endif %}
+                    </small>
+                  </div>
+                  <div class="col-6">
+                    <small class="text-muted d-block">
+                      {% if job.visa_sponsorship %}
+                        <i class="fas fa-globe text-info me-1"></i>Visa OK
+                      {% else %}
+                        <i class="fas fa-user-times text-muted me-1"></i>No Visa
+                      {% endif %}
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Posted Date -->
+              <div class="text-muted small mb-3">
+                <i class="fas fa-calendar-alt me-1"></i>
+                Posted {{ job.created_date|date:"M d, Y" }}
+              </div>
+            </div>
+            <div class="card-footer bg-transparent">
+              <div class="d-grid gap-2">
+                <a href="{% url 'edit_job' job.id %}" class="btn btn-primary">
+                  <i class="fas fa-edit me-2"></i>Manage Job
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- List View (Hidden by default) -->
+    <div id="list-view" class="d-none">
+      <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Job Title</th>
+                <th>Location</th>
+                <th>Salary</th>
+                <th>Type</th>
+                <th>Posted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for job in jobs %}
+                <tr>
+                  <td>
+                    <div class="fw-semibold text-primary">{{ job.title }}</div>
+                    <small class="text-muted">{{ job.skills|truncatechars:50 }}</small>
+                  </td>
+                  <td>{{ job.location }}</td>
+                  <td class="text-success fw-semibold">${{ job.salary|floatformat:0 }}</td>
+                  <td>
+                    {% if job.is_remote %}
+                      <span class="badge bg-success">Remote</span>
+                    {% else %}
+                      <span class="badge bg-secondary">On-site</span>
+                    {% endif %}
+                    {% if job.visa_sponsorship %}
+                      <span class="badge bg-info">Visa OK</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ job.created_date|date:"M d" }}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a href="{% url 'edit_job' job.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <button class="btn btn-outline-danger" onclick="confirmDelete('{{ job.title }}', {{ job.id }})">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- Empty State -->
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm text-center py-5">
+          <div class="card-body">
+            <div class="mb-4">
+              <i class="fas fa-briefcase fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted mb-3">No Job Postings Yet</h4>
+            <p class="text-muted mb-4">Start building your team by posting your first job opening.</p>
+            <a href="{% url 'post_job' %}" class="btn btn-primary btn-lg">
+              <i class="fas fa-plus me-2"></i>Post Your First Job
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Quick Actions -->
+  {% if jobs %}
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="card bg-light border-0">
+        <div class="card-body text-center">
+          <h5 class="text-muted mb-3">
+            <i class="fas fa-rocket me-2"></i>Quick Actions
+          </h5>
+          <div class="btn-group" role="group">
+            <a href="{% url 'post_job' %}" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>Post Another Job
+            </a>
+            <a href="{% url 'recommended.overview' %}" class="btn btn-outline-primary">
+              <i class="fas fa-users me-2"></i>View Candidates
+            </a>
+            <a href="{% url 'home.index' %}" class="btn btn-outline-secondary">
+              <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function switchView(viewType) {
+  const gridView = document.getElementById('grid-view');
+  const listView = document.getElementById('list-view');
+  const buttons = document.querySelectorAll('.btn-group button');
+  
+  // Remove active class from all buttons
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  if (viewType === 'grid') {
+    gridView.classList.remove('d-none');
+    listView.classList.add('d-none');
+    buttons[0].classList.add('active');
+  } else {
+    gridView.classList.add('d-none');
+    listView.classList.remove('d-none');
+    buttons[1].classList.add('active');
+  }
+}
+
+function confirmDelete(jobTitle, jobId) {
+  if (confirm(`Are you sure you want to delete "${jobTitle}"? This action cannot be undone.`)) {
+    // TODO: Implement delete functionality
+    alert('Delete functionality will be implemented in the backend');
+  }
+}
+</script>
+
+<style>
+.job-card {
+  transition: transform 0.2s ease-in-out;
+}
+.job-card:hover {
+  transform: translateY(-5px);
+}
+.table th {
+  border-top: none;
+  font-weight: 600;
+}
+</style>
 {% endblock %}
 
 
