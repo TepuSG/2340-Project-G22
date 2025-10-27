@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-q6j=0k_ps_(go6!83s&@!j(zkc)x&o7a@8qp9d3f#1^m#bpnbf
 DEBUG = True
 
 # Allow setting allowed hosts via environment variable for deployments (comma-separated)
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if os.environ.get('DJANGO_ALLOWED_HOSTS') else []
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if os.environ.get('DJANGO_ALLOWED_HOSTS') else [
+    'team22project.pythonanywhere.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
