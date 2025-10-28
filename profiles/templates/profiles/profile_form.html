@@ -137,9 +137,39 @@
                     <div class="form-check form-switch">{{ form.show_links }} <label for="{{ form.show_links.id_for_label }}" class="form-check-label">Show Links</label></div>
                 </div>
             </div>
-
             <div class="text-center mt-4">
               <button type="submit" class="btn btn-primary btn-lg px-5">Save Profile</button>
+            </div>
+          </form>
+
+          <form method="post" action="{% url 'jobmap.update_distance' %}">
+            {% csrf_token %}
+            <div class="mt-4 p-3 bg-light rounded-3 border">
+              <div class="mb-3">
+                <label for="preferred_distance" class="form-label fw-semibold">
+                  Preferred Distance Current = {{miles}}
+                </label>
+                <div class="input-group input-group-lg">
+                  <input 
+                    type="number" 
+                    name="preferred_distance" 
+                    id="preferred_distance" 
+                    class="form-control" 
+                    placeholder="Enter distance" 
+                    min="0"
+                    step="0.1"
+                    required
+                    value={{miles}}
+                  >
+                  <span class="input-group-text">miles</span>
+                </div>
+                <div class="form-text">
+                  Specify your preferred maximum distance (in miles).
+                </div>
+              </div>
+              <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary px-4">Save Distance</button>
+              </div>
             </div>
           </form>
         </div>
