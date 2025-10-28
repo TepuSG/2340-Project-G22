@@ -1,5 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+.card-hover-lift {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card-hover-lift:hover {
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+  transform: translateY(-5px);
+}
+</style>
 <header class="masthead bg-index text-center py-4">
   <div class="container d-flex align-items-center flex-column pt-2">
     <h2>WorkFlow</h2>
@@ -17,22 +27,9 @@
     
     <!-- Navigation Cards -->
     <div class="row text-center mt-4 justify-content-center">
-      <!-- Sign In Card (only show when not logged in) -->
-      {% if not user.is_authenticated %}
-      <div class="col-sm-6 col-md-4 mb-4">
-        <div class="card h-100 shadow border">
-          <div class="card-body">
-            <h5 class="card-title">Get Started</h5>
-            <p class="card-text">Sign in to your account to manage your profile and applications.</p>
-            <a href="{% url 'accounts.login' %}" class="btn btn-primary">Sign In</a>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      
-      <!-- Job Search / Candidate Search Card -->
+      <!-- Job Search / Candidate Search Card (Left) -->
       <div class="{% if not user.is_authenticated %}col-sm-6 col-md-4{% elif user.is_authenticated and user.is_recruiter %}col-sm-6 col-md-4{% else %}col-sm-6 col-md-6{% endif %} mb-4">
-        <div class="card h-100 shadow border">
+        <div class="card h-100 shadow border card-hover-lift">
           <div class="card-body">
             {% if user.is_authenticated and user.is_recruiter %}
               <h5 class="card-title">Find Candidates</h5>
@@ -47,9 +44,22 @@
         </div>
       </div>
       
-      <!-- Recommendations Card -->
+      <!-- Sign In Card (Middle - only show when not logged in) -->
+      {% if not user.is_authenticated %}
+      <div class="col-sm-6 col-md-4 mb-4">
+        <div class="card h-100 shadow border card-hover-lift">
+          <div class="card-body">
+            <h5 class="card-title">Get Started</h5>
+            <p class="card-text">Sign in to your account to manage your profile and applications.</p>
+            <a href="{% url 'accounts.login' %}" class="btn btn-primary">Sign In</a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Recommendations Card (Right) -->
       <div class="{% if not user.is_authenticated %}col-sm-12 col-md-4{% elif user.is_authenticated and user.is_recruiter %}col-sm-6 col-md-4{% else %}col-sm-6 col-md-6{% endif %} mb-4">
-        <div class="card h-100 shadow border">
+        <div class="card h-100 shadow border card-hover-lift">
           <div class="card-body">
             <h5 class="card-title">Personalized Recommendations</h5>
             {% if user.is_authenticated %}
@@ -72,7 +82,7 @@
       <!-- Recruiter Job Management Card (only show for authenticated recruiters) -->
       {% if user.is_authenticated and user.is_recruiter %}
       <div class="col-sm-12 col-md-4 mb-4">
-        <div class="card h-100 shadow border">
+        <div class="card h-100 shadow border card-hover-lift">
           <div class="card-body">
             <h5 class="card-title">Manage My Job Postings</h5>
             <p class="card-text">View and edit the jobs you've posted to find the best candidates.</p>
