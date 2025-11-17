@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h1 class="mb-4">{{ job.title }} - Applicants Pipeline</h1>
+
+<!-- Include HTMX -->
+<script src="https://unpkg.com/htmx.org@1.9.3"></script>
+
+<div class="d-flex gap-3">
+  {% for status_key, label, apps in status_columns %}
+    <div class="flex-fill bg-light p-3 rounded">
+      <h5 class="text-center">{{ label }}</h5>
+      <div id="{{ status_key }}-column" class="d-flex flex-column gap-2">
+        {% for app in apps %}
+          {% include 'jobs/components/application_card.html' %}
+        {% empty %}
+          <p class="text-muted text-center">No applicants</p>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

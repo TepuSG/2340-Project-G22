@@ -125,6 +125,9 @@
                 <a href="{% url 'edit_job' job.id %}" class="btn btn-primary">
                   <i class="fas fa-edit me-2"></i>Manage Job
                 </a>
+                  <a href="{% url 'job_applicants_pipeline' job.id %}" class="btn btn-outline-primary mt-2">
+                    <i class="fas fa-columns me-2"></i>View Pipeline
+                  </a>
               </div>
             </div>
           </div>

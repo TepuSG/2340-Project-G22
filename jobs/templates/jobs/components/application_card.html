@@ -1,0 +1,17 @@
+<div class="kanban-card p-2 bg-white rounded shadow-sm" style="border-left: 4px solid #0d6efd;">
+    <strong>{{ app.job_seeker.username }}</strong>
+    <div class="text-muted small">Applied: {{ app.applied_at|date:"M d, Y" }}</div>
+
+    <div class="mt-2">
+        {% for new_status, new_label in app.STATUS_CHOICES %}
+            {% if new_status != app.status %}
+                <form method="POST" hx-post="{% url 'update_application_status' app.id new_status %}" hx-target="closest .kanban-card" hx-swap="outerHTML" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-primary mb-1">
+                        Move to {{ new_label }}
+                    </button>
+                </form>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

@@ -6,15 +6,9 @@ so I can find opportunities that match my needs.
 
 So each Job needs to havce all these attrs:
     title, skills, location, salary, remote/on-site, visa sponsorship (done)
-
+    
 
 Filter multi select on these attrs on the html make the page: 
     title, skills, location, salary, remote/on-site, visa sponsorship
 
 make the query for the filtering:(should be good)
-
-
-
-
-
-
