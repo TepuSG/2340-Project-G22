@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth import get_user_model
 from .models import CustomUser, SeekerProfile, RecruiterProfile
+from .models import Notification
 
 User = get_user_model()
 
@@ -58,3 +59,4 @@ class RecruiterProfileAdmin(admin.ModelAdmin):
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(SeekerProfile, SeekerProfileAdmin)
 admin.site.register(RecruiterProfile, RecruiterProfileAdmin)
+admin.site.register(Notification)

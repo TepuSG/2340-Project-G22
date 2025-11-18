@@ -48,3 +48,15 @@ def signup(request):
         template_data['form'] = CustomUserCreationForm(error_class=CustomErrorList)
     print('rendering the form', template_data)
     return render(request, 'accounts/signup.html', {'template_data': template_data})
+
+
+@login_required
+def recruiter_notifications(request):
+    """Placeholder view for recruiter notifications."""
+    # Only allow recruiters to view this page
+    if not getattr(request.user, 'is_recruiter', False):
+        return redirect('home.index')
+
+    template_data = {'title': 'Notifications'}
+    # In future, populate template_data with notifications and unread count
+    return render(request, 'accounts/notifications.html', {'template_data': template_data})

@@ -23,6 +23,14 @@ class CustomUser(AbstractUser):
     def is_recruiter(self):
         return self.role == self.Roles.RECRUITER
 
+    @property
+    def unread_notifications_count(self):
+        """Return count of unread notifications for this user."""
+        try:
+            return self.notifications.filter(is_read=False).count()
+        except Exception:
+            return 0
+
 
 class SeekerProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='seeker')
@@ -39,3 +47,17 @@ class RecruiterProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - Recruiter"
+
+
+class Notification(models.Model):
+    """Simple notification model for users (primarily recruiters)."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.message[:40]}"
