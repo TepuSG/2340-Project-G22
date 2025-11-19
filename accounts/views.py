@@ -52,11 +52,32 @@ def signup(request):
 
 @login_required
 def recruiter_notifications(request):
-    """Placeholder view for recruiter notifications."""
+    """View all recruiter notifications."""
     # Only allow recruiters to view this page
     if not getattr(request.user, 'is_recruiter', False):
         return redirect('home.index')
 
+    notifications = request.user.notifications.all()
     template_data = {'title': 'Notifications'}
-    # In future, populate template_data with notifications and unread count
-    return render(request, 'accounts/notifications.html', {'template_data': template_data})
+    return render(request, 'accounts/notifications.html', {'template_data': template_data, 'notifications': notifications})
+
+
+@login_required
+def mark_notification_read(request, pk):
+    """Mark a notification as read and redirect to the profile if available."""
+    from .models import Notification
+    from django.http import HttpResponseForbidden
+    
+    try:
+        notification = Notification.objects.get(pk=pk, user=request.user)
+    except Notification.DoesNotExist:
+        return HttpResponseForbidden()
+    
+    notification.is_read = True
+    notification.save()
+    
+    # If notification has a profile, redirect to it; otherwise go to notifications list
+    if notification.profile:
+        return redirect('profiles:detail', username=notification.profile.user.username)
+    else:
+        return redirect('accounts.notifications')

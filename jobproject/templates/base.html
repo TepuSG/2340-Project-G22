@@ -102,7 +102,7 @@
                       {% if notifications %}
                         {% for n in notifications %}
                           <li>
-                            <a href="{% if n.profile %}{% url 'profiles:detail' n.profile.user.username %}{% else %}#{% endif %}" class="dropdown-item small py-2{% if not n.is_read %} bg-light{% endif %}">
+                            <a href="{% url 'accounts.mark_notification_read' n.pk %}" class="dropdown-item small py-2{% if not n.is_read %} bg-light{% endif %}">
                               <div class="d-flex justify-content-between align-items-start">
                                 <div class="me-2 text-truncate" style="max-width:200px;">
                                   {% if n.profile %}
