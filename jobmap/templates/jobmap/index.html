@@ -245,9 +245,15 @@
                 <strong>${job.title}</strong><br>
                 <small><i class="fas fa-map-marker-alt"></i> ${job.location}</small><br>
                 ${job.salary ? `<small><i class="fas fa-dollar-sign"></i> $${job.salary.toLocaleString()}</small><br>` : ''}
-                ${job.is_remote ? '<span class="badge bg-success">Remote</span>' : '<span class="badge bg-primary">On-site</span>'}
+                ${job.is_remote ? '<span class="badge bg-success">Remote</span>' : '<span class="badge bg-primary">On-site</span>'}<br><br>
+                
+                <!-- Action button to Django view -->
+                <a href="/application/apply/${job.id}/" class="btn btn-sm btn-primary w-100">
+                  Apply / View Job
+                </a>
               </div>
             `;
+
 
             new mapboxgl.Marker({ color: '#28a745' })
               .setLngLat([lng, lat])

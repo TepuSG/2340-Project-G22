@@ -1,4 +1,4 @@
-#!/Users/momoabucar/Desktop/2340-Project-G22/venv/bin/python3.13
+#!/Users/momoabucar/Downloads/homework09/2340-Project-G22/venv/bin/python3.13
 import sys
 from django.core.management import execute_from_command_line
 if __name__ == '__main__':

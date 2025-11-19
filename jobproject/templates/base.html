@@ -25,6 +25,12 @@
       main.site-content {
         flex: 1 0 auto; /* allow main content to grow and push footer down */
       }
+      #search-results {
+        max-height: 250px; /* optional scroll */
+        overflow-y: auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        width: auto; /* shrink to fit content */
+      }
     </style>
   </head>
   <body>
@@ -87,8 +93,10 @@
               {% endif %}
              </ul>
             <form class="d-flex align-items-center" role="search" action="{% url 'jobs.filters' %}" method="get">
-              <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+              <input id="search-input" class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
               <button class="btn btn-outline-success" type="submit">Search</button>
+              <!-- Autocomplete container -->
+              <div id="search-results" class="list-group position-absolute" style="top: 100%; z-index: 1000; width: 100%;"></div>
               {% if user.is_authenticated and user.is_recruiter %}
                 <div class="ms-2 dropdown">
                   <button class="btn btn-outline-secondary dropdown-toggle position-relative" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
@@ -211,4 +219,60 @@
     </section>
     <!-- Footer -->
   </body>
+ <script>
+const searchInput = document.getElementById("search-input");
+const searchResults = document.getElementById("search-results");
+
+let timeout = null;
+
+searchInput.addEventListener("input", function() {
+    clearTimeout(timeout);
+    const query = this.value.trim();
+
+    if (query.length < 2) {
+        searchResults.innerHTML = "";
+        return;
+    }
+
+    timeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`/jobs/search-suggestions/?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            searchResults.innerHTML = "";
+
+            if (data.length === 0) {
+                searchResults.innerHTML = '<div class="list-group-item disabled">No results found</div>';
+                return;
+            }
+
+            data.forEach(item => {
+                const el = document.createElement("a");
+                el.className = "list-group-item list-group-item-action";
+                el.textContent = item.title;
+
+                // When clicked, fill input and clear suggestions
+                el.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    searchInput.value = item.title;
+                    searchResults.innerHTML = "";
+                });
+
+                searchResults.appendChild(el);
+            });
+        } catch (err) {
+            console.error("Error fetching search suggestions:", err);
+        }
+    }, 250);
+});
+
+// Optional: hide suggestions when clicking outside
+document.addEventListener("click", function(e) {
+    if (!searchResults.contains(e.target) && e.target !== searchInput) {
+        searchResults.innerHTML = "";
+    }
+});
+</script>
+
+
 </html>

@@ -43,6 +43,9 @@
                 <i class="fas fa-map-marker-alt me-2 text-primary"></i>{{ form.location.label }}
               </label>
               {{ form.location }}
+              <!-- Suggestions will appear here -->
+              <div id="location-results" class="list-group mt-1"></div>
+
               {% if form.location.help_text %}
                 <div class="form-text">{{ form.location.help_text }}</div>
               {% endif %}
@@ -164,4 +167,50 @@
     </div>
   </div>
 </div>
+<script>
+const locationInput = document.getElementById("{{ form.location.id_for_label }}");
+const resultsContainer = document.getElementById("location-results");
+
+let timeout = null;
+
+locationInput.addEventListener("input", function() {
+    clearTimeout(timeout);
+    const query = this.value.trim();
+
+    if (query.length < 3) {
+        resultsContainer.innerHTML = "";
+        return;
+    }
+
+    timeout = setTimeout(async () => {
+        try {
+            const response = await fetch(`/jobs/location-search/?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            resultsContainer.innerHTML = "";
+
+            if (data.length === 0) {
+                resultsContainer.innerHTML = '<div class="list-group-item disabled">No results found</div>';
+                return;
+            }
+
+            data.forEach(item => {
+                const el = document.createElement("button");
+                el.type = "button";
+                el.className = "list-group-item list-group-item-action";
+                el.textContent = item.display_name;
+                el.addEventListener("click", () => {
+                    locationInput.value = item.display_name;
+                    resultsContainer.innerHTML = "";
+                });
+                resultsContainer.appendChild(el);
+            });
+        } catch (err) {
+            console.error("Error fetching locations:", err);
+        }
+    }, 300);
+});
+</script>
+
+
 {% endblock %}
