@@ -23,6 +23,30 @@
     </div>
   </form>
 
+  {% if user.is_authenticated and user.is_recruiter %}
+    <div class="mb-3">
+      <form method="post" action="{% url 'recommended.save_search' %}" class="row g-2 align-items-center">
+        {% csrf_token %}
+        <div class="col-auto">
+          <input type="text" name="name" class="form-control form-control-sm" placeholder="Name for saved search (optional)" value="" style="min-width:220px;">
+        </div>
+        <div class="col-auto">
+          <input type="text" name="skills" class="form-control form-control-sm" placeholder="Skills (comma-separated)" value="{{ filters.skills|default:'' }}" style="min-width:220px;">
+        </div>
+        <div class="col-auto">
+          <input type="text" name="location" class="form-control form-control-sm" placeholder="Location" value="{{ filters.location|default:'' }}" style="min-width:180px;">
+        </div>
+        <div class="col-auto">
+          <input type="text" name="projects" class="form-control form-control-sm" placeholder="Project keywords" value="{{ filters.projects|default:'' }}" style="min-width:180px;">
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-sm btn-outline-primary">Save Search</button>
+          <a class="btn btn-sm btn-secondary ms-2" href="{% url 'recommended.saved_searches' %}">Saved searches</a>
+        </div>
+      </form>
+    </div>
+  {% endif %}
+
   {% if not candidates %}
     <div class="alert alert-info">No candidates found matching the criteria.</div>
   {% else %}

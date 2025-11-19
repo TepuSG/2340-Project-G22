@@ -53,6 +53,9 @@ class Notification(models.Model):
     """Simple notification model for users (primarily recruiters)."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     message = models.TextField()
+    # Optional links to what triggered the notification
+    saved_search = models.ForeignKey('recommended.SavedSearch', on_delete=models.SET_NULL, null=True, blank=True)
+    profile = models.ForeignKey('profiles.Profile', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
 

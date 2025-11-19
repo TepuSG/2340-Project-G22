@@ -4,6 +4,57 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from jobs.models import Job
 from .filters import FilterOrchestrator
+from django.shortcuts import redirect
+from django.contrib import messages
+from .models import SavedSearch
+
+@login_required
+def save_search(request):
+    # Only recruiters can save searches
+    if not getattr(request.user, 'is_recruiter', False):
+        return HttpResponseForbidden()
+
+    if request.method != 'POST':
+        return redirect('recommended.candidate_search')
+
+    name = request.POST.get('name', '').strip() or 'Saved Search'
+    skills = request.POST.get('skills', '').strip()
+    keywords = request.POST.get('keywords', '').strip()
+    location = request.POST.get('location', '').strip()
+    projects = request.POST.get('projects', '').strip()
+
+    SavedSearch.objects.create(
+        recruiter=request.user,
+        name=name,
+        skills=skills,
+        keywords=keywords,
+        location=location,
+        projects=projects,
+    )
+    messages.success(request, 'Search saved successfully.')
+    # Redirect back to search with previous filters preserved (if supplied)
+    return redirect(request.META.get('HTTP_REFERER', 'recommended.candidate_search'))
+
+
+@login_required
+def saved_searches_list(request):
+    if not getattr(request.user, 'is_recruiter', False):
+        return HttpResponseForbidden()
+
+    searches = SavedSearch.objects.filter(recruiter=request.user)
+    return render(request, 'recommended/saved_searches_list.html', {'searches': searches})
+
+
+@login_required
+def delete_saved_search(request, pk):
+    if not getattr(request.user, 'is_recruiter', False):
+        return HttpResponseForbidden()
+    ss = get_object_or_404(SavedSearch, pk=pk, recruiter=request.user)
+    if request.method == 'POST':
+        ss.delete()
+        messages.success(request, 'Saved search deleted')
+        return redirect('recommended.saved_searches')
+    return render(request, 'recommended/confirm_delete.html', {'object': ss})
 
 
 # Create your views here.
