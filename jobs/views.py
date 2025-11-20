@@ -23,11 +23,32 @@ def available_jobs(request):
 def filters(request):
     from home.filters import FilterOrchestrator
 
-    jobs = FilterOrchestrator().apply_filters(Job.objects.all(), request.GET)
+    # Get all jobs filtered
+    jobs_or_ai = FilterOrchestrator().apply_filters(Job.objects.all(), request.GET)
 
-    template_data = {}
-    template_data["title"] = "Filtered Jobs"
-    template_data["jobs"] = jobs
+    template_data = {
+        "title": "Filtered Jobs",
+        "jobs": [],
+        "ai_resp": None,
+        "name": None,
+        "prompt": None,
+    }
+
+    # Determine if this is AI search or regular search
+    if request.GET:
+        query_key = list(request.GET.keys())[0]  # usually 'ai' or 'search'
+        template_data["name"] = query_key
+        template_data["prompt"] = request.GET.get(query_key)
+
+    if template_data["name"] == "ai":
+        # Store AI response for chat-style display
+        template_data["ai_resp"] = jobs_or_ai
+    else:
+        # Normal job list
+        if isinstance(jobs_or_ai, list):
+            template_data["jobs"] = jobs_or_ai
+        else:
+            template_data["jobs"] = []
 
     return render(request, "jobs/index.html", {"template_data": template_data})
 

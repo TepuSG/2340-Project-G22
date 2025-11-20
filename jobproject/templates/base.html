@@ -96,6 +96,7 @@
             max-width: 600px;
             text-align: center;
             position: relative;
+            height: 95%;
         }
         .overlay-content h2 {
             color: white;
@@ -130,6 +131,9 @@
         .overlay-content input[type="search"]::placeholder {
             color: rgba(255,255,255,0.7);
         }
+        .search-form-home{
+            transition: transform 1s ease-in;
+        }
         .overlay-content button[type="submit"] {
             position: absolute;
             right: 10px;
@@ -140,6 +144,10 @@
             color: white;
             font-size: 1.2rem;
             cursor: pointer;
+        }
+        #overlay-search-form{
+            position: relative;
+            z-index: 10000;
         }
         #overlay-search-results {
             max-height: 300px;
@@ -169,6 +177,137 @@
         .ms-footer a:hover {
             color: #a0c4ff;
         }
+        /* Search mode tabs */
+.search-mode-toggle {
+    display: flex;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.search-tab {
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+}
+
+.search-tab.active {
+    background: rgba(255, 255, 255, 0.8);
+    color: #222;
+}
+.overlay-content-container{
+    width: 100%;
+    display:flex;
+    justify-content: center;
+    align-items:center;
+}
+
+/* Move input near bottom when AI is selected */
+.search-overlay.ai-mode .overlay-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* pushes content toward bottom */
+    height: 90%; /* leaves some padding at the top */
+    padding-bottom: 5vh; /* small space from bottom */
+    align-items: center;
+}
+
+.search-overlay.ai-mode .search-mode-toggle {
+    margin-bottom: 20px; /* spacing above input */
+}
+
+.search-overlay.ai-mode form {
+    width: 80%; /* input width */
+    transition: all 0.3s ease;
+}
+
+/* Wrap the form + results in a container for translation */
+.overlay-input-container {
+    width: 100%;
+    transition: transform 0.5s ease; /* smooth movement */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+/* Move the container down when AI is selected */
+.search-overlay.ai-mode .overlay-input-container {
+    transform: translateY(60vh); /* pushes it near the bottom */
+}
+
+
+
+.ai-welcome-text.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.ai-search-welcome {
+   color: white;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    opacity: 0;
+    font-size: 30px;
+    transition: all 0.5s ease;
+    transform: translate(-50%, -50%) scale(0.8);
+}
+#ai-chat-container {
+    display: none; /* hidden by default */
+    width: 100%;
+    height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+    margin-bottom: 20px;
+
+    /* LAYERED FADE BACKGROUND */
+    background: linear-gradient(
+        to bottom,
+        #6397e2 0%,
+        #6a9ae3 40%,
+        #75a0de 100%
+    );
+
+    border-radius: 2px;
+}
+
+.chat-msg-group{
+    display:flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.chat-q{
+    width: 100%;
+    display: flex;
+    justify-content: left;
+}
+.chat-q-text{
+    background-color: aliceblue;
+        padding: 20px;
+    border-radius: 5px;
+}
+
+.chat-r {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+}
+.chat-r-text {
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.12); /* soft glass look */
+    backdrop-filter: blur(6px);
+    margin: 20px;
+    padding: 20px;
+}
+
     </style>
 </head>
 
@@ -276,13 +415,37 @@
 <div id="search-overlay" class="search-overlay">
     <div class="overlay-content">
         <button id="close-search" class="close-btn">&times;</button>
-        <h2>Search</h2>
-        <form action="{% url 'jobs.filters' %}" method="get">
-            <input id="overlay-search-input" type="search" name="search" placeholder="Search jobs..." autocomplete="off">
-            <button type="submit"><i class="fas fa-search"></i></button>
-        </form>
-        <div id="overlay-search-results" class="list-group"></div>
+
+        <div class="overlay-input-container">
+            <div class="overlay-content-container">
+                <div class="search-mode-toggle">
+                    <div id="regular-search-tab" class="search-tab active">Search</div>
+                    <div id="ai-search-tab" class="search-tab">AI</div>
+                </div>
+            </div>
+            <div class="ai-search-welcome">Welcome to AI-powered search!</div>
+            <!-- AI Chat Results -->
+            <div id="ai-chat-container">
+                
+                <div class="chat-msg-group">
+                    <div class="chat-r">
+                        <div class="chat-r-text"></div>
+                    </div>
+                    <div class="chat-q">
+                        <div class="chat-q-text"></div>
+                    </div>
+                </div>
+            </div>
+            <form id="overlay-search-form" class="search-form-home" action="{% url 'jobs.filters' %}" method="get">
+                <input id="overlay-search-input" type="search" name="search" placeholder="Search jobs..." autocomplete="off">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+            <div id="overlay-search-results" class="list-group"></div>
+
+            
+        </div>
     </div>
+
 </div>
 
 <main class="site-content">
@@ -399,8 +562,107 @@
             overlayResults.innerHTML = "";
         }
     });
+
+const regularTab = document.getElementById("regular-search-tab");
+const aiTab = document.getElementById("ai-search-tab");
+const overlayInputContainer = document.querySelector(".search-form-home");
+const welcomeText = document.querySelector('.ai-search-welcome')
+const searchInput = document.getElementById('overlay-search-input')
+const aiChatContainer = document.getElementById('ai-chat-container')
+const queryText = document.querySelector('.chat-q-text')
+const respText = document.querySelector('.chat-r-text')
+
+aiTab.addEventListener("click", () => {
+    aiTab.classList.add("active");
+    regularTab.classList.remove("active");
+
+    overlayInput.placeholder = "Search with AI...";
+    searchInput.name = 'ai';
+
+    // Move input down
+    // overlayInputContainer.style.transform = "translateY(300px)"; 
+
+            // Show AI chat
+     aiChatContainer.style.display = "block";
+    
+    overlayResults.style.display  = 'none'
+
+    // Show welcome text
+    welcomeText.style.opacity = "1";
+});
+
+regularTab.addEventListener("click", () => {
+    regularTab.classList.add("active");
+    aiTab.classList.remove("active");
+
+    overlayInput.placeholder = "Search jobs...";
+    searchInput.name = 'search';
+
+    // Reset input position
+
+    // Hide AI chat
+    aiChatContainer.style.display = "none";
+
+    overlayResults.style.display = 'block'
+
+
+    // Hide welcome text
+    welcomeText.style.opacity = "0";
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    {% if template_data.name == 'ai' %}
+
+        // Show overlay
+        searchOverlay.classList.add("active");
+
+        // Activate AI tab
+        aiTab.classList.add("active");
+        regularTab.classList.remove("active");
+
+        // Setup input for AI
+        overlayInput.placeholder = "Search with AI...";
+        overlayInput.name = "ai";
+
+        // Fill input with prompt
+        overlayInput.value = "{{ template_data.prompt|escapejs }}";
+        console.log('feeding ai mesage', "{{ template_data.prompt|escapejs }}", "{{ template_data.ai_resp|escapejs }}")
+        // Fill chat bubbles (safe)
+        if (respText) respText.innerText = "{{ template_data.prompt|escapejs }}";
+        else console.log('resp ont availble')
+        if (queryText) queryText.innerText = "{{ template_data.ai_resp|escapejs }}";
+
+        // Show AI chat container
+        aiChatContainer.style.display = "block";
+
+        // Scroll chat to bottom
+        aiChatContainer.scrollTop = aiChatContainer.scrollHeight;
+
+        // Hide welcome text
+        if (welcomeText) welcomeText.style.opacity = "0";
+
+        // Focus input
+        overlayInput.focus();
+
+    {% else %}
+
+        // Not AI mode → hide the chat container
+        if (aiChatContainer) aiChatContainer.style.display = "none";
+
+    {% endif %}
+
+});
+
+
+
+
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+
+
 </body>
+
 </html>

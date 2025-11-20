@@ -20,7 +20,15 @@ class Job(models.Model):
     )
 
     def __str__(self):
-        return f"{self.title} ({self.recruiter.username})"
+        remote_status = "Remote" if self.is_remote else "On-site"
+        visa_status = (
+            "Visa sponsorship" if self.visa_sponsorship else "No visa sponsorship"
+        )
+        skills_preview = ", ".join(self.skills_list[:3])  # show first 3 skills
+        return (
+            f"{self.title} | {self.location} | ${self.salary} | {remote_status} | "
+            f"{visa_status} | Skills: {skills_preview} | Posted by {self.recruiter.username}"
+        )
 
     @property
     def skills_list(self):
