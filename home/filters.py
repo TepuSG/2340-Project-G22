@@ -10,7 +10,9 @@ class Filterable(ABC):
 
 class TitleFitler(Filterable):
     def apply_filter(self, qs, value):
+        print("using the title filter", value, qs)
         qs = qs.filter(title__icontains=value)
+        print("filtered query, ", qs)
         return qs
 
 

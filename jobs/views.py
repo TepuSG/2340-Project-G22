@@ -23,6 +23,7 @@ def available_jobs(request):
 def filters(request):
     from home.filters import FilterOrchestrator
 
+    print(request, request.GET)
     # Get all jobs filtered
     jobs_or_ai = FilterOrchestrator().apply_filters(Job.objects.all(), request.GET)
 
@@ -45,10 +46,9 @@ def filters(request):
         template_data["ai_resp"] = jobs_or_ai
     else:
         # Normal job list
-        if isinstance(jobs_or_ai, list):
-            template_data["jobs"] = jobs_or_ai
-        else:
-            template_data["jobs"] = []
+        template_data["jobs"] = jobs_or_ai
+
+    print("rednering the jobs", template_data)
 
     return render(request, "jobs/index.html", {"template_data": template_data})
 
