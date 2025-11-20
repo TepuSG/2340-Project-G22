@@ -1,30 +1,152 @@
+<div class="col-12 col-md-6 col-lg-4 mb-4">
+  <div class="card job-card">
 
-<div class="col-md-6 col-lg-4">
-  <div class="card h-100 shadow-sm">
-    <div class="card-body">
-      <h5 class="card-title">{{ job.title }}</h5>
-      <p class="card-text">
-        <strong>Skills:</strong> {{ job.skills|linebreaksbr }}
-      </p>
-      <ul class="list-unstyled mb-3">
+    <div class="card-body d-flex flex-column">
+
+      <!-- Job Title -->
+      <h4 class="job-title">{{ job.title }}</h4>
+
+      <!-- Skills -->
+      {% if job.skills_list %}
+      <div class="job-skills mb-3">
+        {% for skill in job.skills_list %}
+          <span class="skill-tag">{{ skill }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <hr class="job-divider">
+
+      <!-- Job Details -->
+      <ul class="list-unstyled job-details mb-3">
         <li><strong>Location:</strong> {{ job.location }}</li>
         <li><strong>Salary:</strong> ${{ job.salary }}</li>
-        <li>
-          <strong>Remote:</strong>
-          {% if job.is_remote %} ✅ Yes {% else %} ❌ No {% endif %}
-        </li>
-        <li>
-          <strong>Visa Sponsorship:</strong>
-          {% if job.visa_sponsorship %} ✅ Available {% else %} ❌ Not available {% endif %}
-        </li>
+        <li><strong>Remote:</strong> {% if job.is_remote %} ✅ Yes {% else %} ❌ No {% endif %}</li>
+        <li><strong>Visa Sponsorship:</strong> {% if job.visa_sponsorship %} ✅ Available {% else %} ❌ Not available {% endif %}</li>
       </ul>
-        {% if user.is_recruiter%}
-            <a href="{% url 'edit_job' job.id %}" class="btn btn-primary mt-auto w-100">Edit Job</a>
-        {% elif user.is_authenticated and user.is_seeker%}
-            <a href="{% url 'apply_to_job' job.id %}" class="btn btn-primary mt-auto w-100">Apply Now</a>
-        {% else %}
-              <a href="{% url 'accounts.login' %}?next={% url 'apply_to_job' job.id %}" class="btn btn-primary mt-auto w-100"> Apply Now</a>
-        {% endif %}
+
+      <!-- Action Button -->
+      {% if user.is_recruiter %}
+        <a href="{% url 'edit_job' job.id %}" class="btn btn-job mt-auto">Edit Job</a>
+      {% elif user.is_authenticated and user.is_seeker %}
+        <a href="{% url 'apply_to_job' job.id %}" class="btn btn-job mt-auto">Apply Now</a>
+      {% else %}
+        <a href="{% url 'accounts.login' %}?next={% url 'apply_to_job' job.id %}" class="btn btn-job mt-auto">Apply Now</a>
+      {% endif %}
+
     </div>
   </div>
 </div>
+
+<style>
+/* Flex container for equal height cards */
+.row-equal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem; /* spacing between cards */
+}
+
+/* Card */
+.job-card {
+    border-radius: 12px;
+    padding: 18px;
+    background-color: #ffffff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+    opacity: 0;
+    transform: translateY(20px);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Animate when in view */
+.job-card.in-view {
+    opacity: 1;
+    transform: translateY(0);
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+/* Hover effect */
+.job-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Job Title */
+.job-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+/* Skills Tags */
+.job-skills {
+    margin-bottom: 15px;
+}
+.skill-tag {
+    display: inline-block;
+    background: #f0f4ff;
+    color: #1a73e8;
+    font-weight: 500;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin: 2px 4px 2px 0;
+}
+
+/* Divider */
+.job-divider {
+    border-top: 1px solid #eee;
+    margin: 16px 0;
+}
+
+/* Job Details */
+.job-details {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #555;
+    text-align: left;
+    flex-grow: 1;
+}
+
+/* Buttons */
+.btn-job {
+    background-color: #1a73e8;
+    color: white;
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 10px;
+    font-size: 0.95rem;
+    text-align: center;
+    transition: background-color 0.2s, transform 0.2s;
+    display: block;
+    width: 100%;
+}
+
+.btn-job:hover {
+    background-color: #155ab6;
+    transform: translateY(-2px);
+}
+</style>
+
+<script>// Intersection Observer with faster staggered animation
+document.addEventListener("DOMContentLoaded", function() {
+    const cards = document.querySelectorAll('.job-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                const delay = Array.from(cards).indexOf(entry.target) * 50; // faster stagger: 50ms
+                setTimeout(() => {
+                    entry.target.classList.add('in-view');
+                }, delay);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    cards.forEach(card => observer.observe(card));
+});
+</script>

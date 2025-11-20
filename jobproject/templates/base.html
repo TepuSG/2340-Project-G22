@@ -1,278 +1,406 @@
 <!DOCTYPE html>
-<html>
-  {% load static %}
-  <head>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ template_data.title }}</title>
+
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"crossorigin="anonymous">
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <style>
-      /* Minimal flexbox layout to keep footer at the bottom */
-      html, body {
-        height: 100%;
-      }
-      body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
-      main.site-content {
-        flex: 1 0 auto; /* allow main content to grow and push footer down */
-      }
-      #search-results {
-        max-height: 250px; /* optional scroll */
-        overflow-y: auto;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        width: auto; /* shrink to fit content */
-      }
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: 'Raleway', sans-serif;
+        }
+        main.site-content {
+            flex: 1 0 auto;
+        }
+
+        /* Navbar Styles */
+        .navbar .nav-link:not(.dropdown-toggle) {
+            color: #4dabf7 !important;
+            background: transparent !important;
+            font-weight: 500;
+        }
+        .navbar .nav-link:not(.dropdown-toggle):hover {
+            color: #a0c4ff !important;
+        }
+        .navbar .dropdown-toggle {
+            color: #4dabf7;
+        }
+        .navbar .dropdown-toggle:hover {
+            color: #a0c4ff;
+        }
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background-color: white;
+        }
+        .navbar .btn, .navbar .nav-link {
+            background: transparent !important;
+            border: none !important;
+            color: #4dabf7 !important;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .navbar .btn:hover, .navbar .nav-link:hover {
+            color: #a0c4ff !important;
+            background: transparent !important;
+        }
+        .navbar #open-search,
+        .navbar .btn-primary,
+        .navbar .btn-outline-primary {
+            color: #4dabf7 !important;
+        }
+        .navbar #open-search:hover,
+        .navbar .btn-primary:hover,
+        .navbar .btn-outline-primary:hover {
+            color: #a0c4ff !important;
+            background: transparent !important;
+        }
+
+        /* Fullscreen Search Overlay */
+        .search-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #75a0de;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        .search-overlay.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 15vh;
+        }
+        .overlay-content {
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+        }
+        .overlay-content h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .overlay-content .close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 2rem;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        .overlay-content form {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .overlay-content input[type="search"] {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border-radius: 50px;
+            border: none;
+            outline: none;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .overlay-content input[type="search"]::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        .overlay-content button[type="submit"] {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        #overlay-search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            text-align: left;
+        }
+        #overlay-search-results .list-group-item {
+            background: transparent;
+            color: white;
+            border: none;
+        }
+        #overlay-search-results .list-group-item:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Footer */
+        .ms-footer {
+            background: #222;
+            color: white;
+        }
+        .ms-footer a {
+            color: white;
+            text-decoration: none;
+        }
+        .ms-footer a:hover {
+            color: #a0c4ff;
+        }
     </style>
-  </head>
-  <body>
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary custom-lightblue">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home.index' %}">WorkFlow</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link {% if request.path == '/' %}active{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %} href="{% url 'home.index' %}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Account
-                </a>
-                <ul class="dropdown-menu">
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="{% url 'accounts.signup' %}">Sign Up</a></li>
-                  {% if user.is_authenticated %}
-                    <li><a class="dropdown-item" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a></li>
-                    {% else %}
-                    <li><a class="dropdown-item" href="{% url 'accounts.login' %}">Login</a></li>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home.index' %}">WorkFlow</a>
+            <button id="open-search" class="btn btn-outline-success ms-2">
+                <i class="fas fa-search"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home.index' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                            <li><a class="dropdown-item" href="{% url 'accounts.signup' %}">Sign Up</a></li>
+                            {% if user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{% url 'accounts.logout' %}">Logout ({{ user.username }})</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'accounts.login' %}">Login</a></li>
+                            {% endif %}
+                            {% if user.is_seeker %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% if request.user.is_authenticated and request.user.is_seeker %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Look for Jobs</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'jobs.index' %}">Available Jobs</a></li>
+                                <li><a class="dropdown-item" href="{% url 'recommended.index' %}">Recommendations</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'jobmap.index' %}">Job Map</a></li>
+                            </ul>
+                        </li>
                     {% endif %}
-                    {% if user.is_seeker %}
-                      <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
+                    {% if request.user.is_authenticated and request.user.is_recruiter %}
+                        <a href="{% url 'post_job' %}" class="btn btn-primary ms-2">Post Job</a>
                     {% endif %}
                 </ul>
-              </li>
 
-          {% if request.user.is_authenticated and request.user.is_seeker %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Look for Jobs
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'jobs.index' %}">Available Jobs</a></li>
-                
                 {% if user.is_authenticated %}
-                  <li><a class="dropdown-item" href="{% url 'recommended.index' %}">Recommendations</a></li>
-                {% else %}
-                  <li><a class="dropdown-item" href="{% url 'accounts.login' %}">Recommendations</a></li>
-                {% endif %}       
-
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{% url 'jobmap.index' %}">Job Map</a></li>
-              </ul>
-            </li>
-          {% endif %}
-              {% if request.user.is_authenticated and request.user.is_recruiter %}
-                <a href="{% url 'post_job' %}" class="btn btn-primary" style="margin-left: 10px;">
-                    Post Job
-                </a>
-              {% endif %}
-             </ul>
-            <form class="d-flex align-items-center" role="search" action="{% url 'jobs.filters' %}" method="get">
-              <input id="search-input" class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Search</button>
-              <!-- Autocomplete container -->
-              <div id="search-results" class="list-group position-absolute" style="top: 100%; z-index: 1000; width: 100%;"></div>
-              {% if user.is_authenticated and user.is_recruiter %}
-                <div class="ms-2 dropdown">
-                  <button class="btn btn-outline-secondary dropdown-toggle position-relative" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    {% if user.unread_notifications_count %}
-                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ user.unread_notifications_count }}</span>
+                    {% if user.is_recruiter %}
+                        <div class="ms-2 dropdown d-inline-block">
+                            <button class="btn btn-outline-secondary dropdown-toggle position-relative" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                                <i class="fas fa-bell"></i>
+                                {% if user.unread_notifications_count %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        {{ user.unread_notifications_count }}
+                                    </span>
+                                {% endif %}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notifDropdown" style="min-width:300px;">
+                                {% with notifications=user.notifications.all|slice:":5" %}
+                                    {% if notifications %}
+                                        {% for n in notifications %}
+                                            <li>
+                                                <a href="{% url 'accounts.mark_notification_read' n.pk %}" class="dropdown-item small py-2{% if not n.is_read %} bg-light{% endif %}">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div class="me-2 text-truncate" style="max-width:200px;">
+                                                            {% if n.profile %}
+                                                                <strong>
+                                                                    {% if n.profile.user.get_full_name %}
+                                                                        {{ n.profile.user.get_full_name }}
+                                                                    {% else %}
+                                                                        {{ n.profile.user.username }}
+                                                                    {% endif %}
+                                                                </strong>
+                                                                <div class="small text-muted">Matched for "{% if n.saved_search %}{{ n.saved_search.name }}{% else %}saved search{% endif %}"</div>
+                                                            {% else %}
+                                                                {{ n.message }}
+                                                            {% endif %}
+                                                        </div>
+                                                        <small class="text-muted">{{ n.created_at|timesince }} ago</small>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                        {% endfor %}
+                                        <li><a class="dropdown-item text-center" href="{% url 'accounts.notifications' %}">View all notifications</a></li>
+                                    {% else %}
+                                        <li class="dropdown-item text-center text-muted">No notifications</li>
+                                    {% endif %}
+                                {% endwith %}
+                            </ul>
+                        </div>
                     {% endif %}
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="notifDropdown" style="min-width:300px;">
-                    {% with notifications=user.notifications.all|slice:":5" %}
-                      {% if notifications %}
-                        {% for n in notifications %}
-                          <li>
-                            <a href="{% url 'accounts.mark_notification_read' n.pk %}" class="dropdown-item small py-2{% if not n.is_read %} bg-light{% endif %}">
-                              <div class="d-flex justify-content-between align-items-start">
-                                <div class="me-2 text-truncate" style="max-width:200px;">
-                                  {% if n.profile %}
-                                    <strong>
-                                      {% if n.profile.user.get_full_name %}
-                                        {{ n.profile.user.get_full_name }}
-                                      {% else %}
-                                        {{ n.profile.user.username }}
-                                      {% endif %}
-                                    </strong>
-                                    <div class="small text-muted">Matched for "{% if n.saved_search %}{{ n.saved_search.name }}{% else %}saved search{% endif %}"</div>
-                                  {% else %}
-                                    {{ n.message }}
-                                  {% endif %}
-                                </div>
-                                <small class="text-muted">{{ n.created_at|timesince }} ago</small>
-                              </div>
-                            </a>
-                          </li>
-                          <li><hr class="dropdown-divider"></li>
-                        {% endfor %}
-                        <li><a class="dropdown-item text-center" href="{% url 'accounts.notifications' %}">View all notifications</a></li>
-                      {% else %}
-                        <li class="dropdown-item text-center text-muted">No notifications</li>
-                      {% endif %}
-                    {% endwith %}
-                  </ul>
-                </div>
-              {% endif %}
-              {% if user.is_authenticated %}
-                <a class="btn btn-outline-primary ms-2 px-3" style="min-width:110px;" href="{% url 'profiles:edit' %}">My Profile</a>
-              {% endif %}
-            </form>
-          </div>
+
+                    <a class="btn btn-outline-primary ms-2 px-3" href="{% url 'profiles:edit' %}">Profile</a>
+                {% endif %}
         </div>
-      </nav>
-    <!-- Header -->
-    <main class="site-content">
-      {% if messages %}
+    </div>
+</nav>
+
+<div id="search-overlay" class="search-overlay">
+    <div class="overlay-content">
+        <button id="close-search" class="close-btn">&times;</button>
+        <h2>Search</h2>
+        <form action="{% url 'jobs.filters' %}" method="get">
+            <input id="overlay-search-input" type="search" name="search" placeholder="Search jobs..." autocomplete="off">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+        <div id="overlay-search-results" class="list-group"></div>
+    </div>
+</div>
+
+<main class="site-content">
+    {% if messages %}
         <div class="container mt-3">
-          {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          {% endfor %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
         </div>
-      {% endif %}
-      <div>
-        {% block content %}
-        {% endblock content %}
-      </div>
-    </main>
-    <!-- Footer -->
-      <section class="p-3 ms-footer">
-        <div class="container">
-          <div class="row mt-3 text-white align-items-start">
-            <div class="col-12 col-md-6 col-lg-6 mb-4">
-              <h5 class="mb-2">WorkFlow</h5>
-              <hr />
-              <p class="mb-0">
-                Welcome to WorkFlow, your best friend in the job search!
-                Here at WorkFlow, we understand the challenges of finding a 
-                job that aligns with your skills and aspirations. Our mission is to
-                simplify the job search process and connect you with recruiters and 
-                different companies looking for similar skills and interests to you.
-              </p>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<section class="p-3 ms-footer">
+    <div class="container">
+        <div class="row mt-3 align-items-start">
+            <div class="col-md-6 mb-4">
+                <h5>WorkFlow</h5>
+                <hr>
+                <p>Welcome to WorkFlow, your best friend in the job search! We connect you with jobs matching your skills and goals.</p>
             </div>
-            <div class="col-6 col-md-3 col-lg-3 mb-4">
-              <h6 class="mb-2">LINKS</h6>
-              <hr />
-              <ul class="list-unstyled mb-0">
-                <li><a class="nav-link p-0 text-white" href="#">About</a></li>
-                <li><a class="nav-link p-0 text-white" href="#">Jobs</a></li>
-              </ul>
+            <div class="col-md-3 mb-4">
+                <h6>LINKS</h6>
+                <hr>
+                <ul class="list-unstyled">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Jobs</a></li>
+                </ul>
             </div>
-            <div class="col-6 col-md-3 col-lg-3 mb-4">
-              <h6 class="mb-2">CONTACT</h6>
-              <hr />
-              <p class="mb-1"><i class="fas fa-home me-2"></i>
-                30332-0530 Atlanta, Georgia
-              </p>
-              <p class="mb-1"><i class="fas fa-envelope me-2"></i>
-                info@workflow.com
-              </p>
-              <p class="mb-0"><i class="fas fa-phone me-2"></i>
-                +81 04-4400-4400
-              </p>
+            <div class="col-md-3 mb-4">
+                <h6>CONTACT</h6>
+                <hr>
+                <p><i class="fas fa-home me-2"></i>30332-0530 Atlanta, Georgia</p>
+                <p><i class="fas fa-envelope me-2"></i>info@workflow.com</p>
+                <p><i class="fas fa-phone me-2"></i>+81 04-4400-4400</p>
             </div>
-          </div>
         </div>
-      </section>
-    <section class="p-3 ms-footer-bottom bg-dark">
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-12 col-md-6 text-white text-start mb-2 mb-md-0">
-            <span>Website Created By
-              <a class="text-white" target="_blank">2340 Team 22</a>
-            </span>
-          </div>
-          <div class="col-12 col-md-6 text-white text-md-end text-start">
-            <span>2025</span>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- Footer -->
-  </body>
- <script>
-const searchInput = document.getElementById("search-input");
-const searchResults = document.getElementById("search-results");
+    </div>
+</section>
 
-let timeout = null;
+<section class="p-3 bg-black text-white">
+    <div class="container d-flex justify-content-between">
+        <span>Website Created By <strong>2340 Team 22</strong></span>
+        <span>2025</span>
+    </div>
+</section>
 
-searchInput.addEventListener("input", function() {
-    clearTimeout(timeout);
-    const query = this.value.trim();
+<script>
+    const openSearchBtn = document.getElementById("open-search");
+    const closeSearchBtn = document.getElementById("close-search");
+    const searchOverlay = document.getElementById("search-overlay");
+    const overlayInput = document.getElementById("overlay-search-input");
+    const overlayResults = document.getElementById("overlay-search-results");
 
-    if (query.length < 2) {
-        searchResults.innerHTML = "";
-        return;
-    }
+    // Open overlay
+    openSearchBtn.addEventListener("click", () => {
+        searchOverlay.classList.add("active");
+        overlayInput.focus();
+    });
 
-    timeout = setTimeout(async () => {
-        try {
-            const response = await fetch(`/jobs/search-suggestions/?q=${encodeURIComponent(query)}`);
-            const data = await response.json();
+    // Close overlay
+    closeSearchBtn.addEventListener("click", () => {
+        searchOverlay.classList.remove("active");
+        overlayResults.innerHTML = "";
+    });
 
-            searchResults.innerHTML = "";
-
-            if (data.length === 0) {
-                searchResults.innerHTML = '<div class="list-group-item disabled">No results found</div>';
-                return;
-            }
-
-            data.forEach(item => {
-                const el = document.createElement("a");
-                el.className = "list-group-item list-group-item-action";
-                el.textContent = item.title;
-
-                // When clicked, fill input and clear suggestions
-                el.addEventListener("click", function(e) {
-                    e.preventDefault();
-                    searchInput.value = item.title;
-                    searchResults.innerHTML = "";
-                });
-
-                searchResults.appendChild(el);
-            });
-        } catch (err) {
-            console.error("Error fetching search suggestions:", err);
+    // Close overlay on ESC
+    document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            searchOverlay.classList.remove("active");
+            overlayResults.innerHTML = "";
         }
-    }, 250);
-});
+    });
 
-// Optional: hide suggestions when clicking outside
-document.addEventListener("click", function(e) {
-    if (!searchResults.contains(e.target) && e.target !== searchInput) {
-        searchResults.innerHTML = "";
-    }
-});
+    // Autocomplete logic
+    let overlayTimeout = null;
+    overlayInput.addEventListener("input", function() {
+        clearTimeout(overlayTimeout);
+        const query = this.value.trim();
+        if (query.length < 2) { overlayResults.innerHTML = ""; return; }
+
+        overlayTimeout = setTimeout(async () => {
+            try {
+                const response = await fetch(`/jobs/search-suggestions/?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                overlayResults.innerHTML = "";
+
+                if (data.length === 0) {
+                    overlayResults.innerHTML = '<div class="list-group-item disabled">No results found</div>';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const el = document.createElement("a");
+                    el.className = "list-group-item list-group-item-action";
+                    el.textContent = item.title;
+                    el.addEventListener("click", e => {
+                        e.preventDefault();
+                        overlayInput.value = item.title;
+                        overlayResults.innerHTML = "";
+                    });
+                    overlayResults.appendChild(el);
+                });
+            } catch (err) { console.error(err); }
+        }, 250);
+    });
+
+    // Close autocomplete on outside click
+    document.addEventListener("click", function(e) {
+        if (!overlayResults.contains(e.target) && e.target !== overlayInput && !openSearchBtn.contains(e.target)) {
+            overlayResults.innerHTML = "";
+        }
+    });
 </script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
 </html>

@@ -1,97 +1,121 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-.card-hover-lift {
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+/* 2025 Wavy Landing Background */
+.hero-waves {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* full screen hero */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #5a7cff, #6ee2f5);
+  animation: gradientMove 8s ease infinite alternate;
 }
 
-.card-hover-lift:hover {
-  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
-  transform: translateY(-5px);
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 180px;
+  background-repeat: repeat-x;
+  background-size: cover;
+  opacity: 0.5;
+  animation: waveMove 10s linear infinite;
+}
+
+#wave1 { 
+  background-image: url("data:image/svg+xml,%3Csvg width='1920' height='180' viewBox='0 0 1920 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 Q480 120 960 60 T1920 60 V180 H0 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+  opacity: .40; animation-duration: 12s; 
+}
+#wave2 { 
+  background-image: url("data:image/svg+xml,%3Csvg width='1920' height='180' viewBox='0 0 1920 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 100 Q480 40 960 100 T1920 100 V180 H0 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+  opacity: .25; animation-duration: 18s; 
+}
+#wave3 { 
+  background-image: url("data:image/svg+xml,%3Csvg width='1920' height='180' viewBox='0 0 1920 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 80 Q480 160 960 80 T1920 80 V180 H0 Z' fill='%23ffffff'/%3E%3C/svg%3E");
+  opacity: .15; animation-duration: 25s; 
+}
+
+@keyframes waveMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Hero text positioning */
+.hero-center {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  padding: 0 20px;
+}
+
+.hero-title {
+  font-size: 3.4rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.hero-subtitle {
+  margin-top: 10px;
+  font-size: 1.35rem;
+  opacity: 0.9;
+}
+
+.hero-btn {
+  margin-top: 25px;
+  padding: 14px 34px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+/* Different shades of blue for buttons */
+.hero-btn.explore-jobs { 
+  background-color: #1e3a8a; /* dark blue */
+  border-color: #1e3a8a; 
+  color: #fff;
+}
+
+.hero-btn.find-candidates { 
+  background-color: #3b82f6; /* lighter blue */
+  border-color: #3b82f6; 
+  color: #fff;
+}
+
+.hero-btn.explore-jobs:hover { 
+  background-color: #3749a3; 
+  border-color: #3749a3; 
+}
+
+.hero-btn.find-candidates:hover { 
+  background-color: #60a5fa; 
+  border-color: #60a5fa; 
 }
 </style>
-<header class="masthead bg-index text-center py-4">
-  <div class="container d-flex align-items-center flex-column pt-2">
-    <h2>WorkFlow</h2>
-    <p>Your best friend in the Job Search</p>
-  </div>
-</header>
-<div class="p-3">
-  <div class="container">
-    <div class="row mt-3">
-      <div class="col mx-auto text-center mb-3">
-        <h4>Welcome to WorkFlow! Here is where you can find your Dream Job!</h4>
-        <p>Use the search bar above to filter jobs by title, skills, location, salary, remote/on-site, and visa sponsorship.</p>
-      </div>
-    </div>
+
+<section class="hero-waves">
+  <div class="wave" id="wave1"></div>
+  <div class="wave" id="wave2"></div>
+  <div class="wave" id="wave3"></div>
+
+  <div class="hero-center">
+    <h1 class="hero-title">Find Your Future Today</h1>
+    <p class="hero-subtitle">Smart job matching powered by modern AI</p>
     
-    <!-- Navigation Cards -->
-    <div class="row text-center mt-4 justify-content-center">
-      <!-- Job Search / Candidate Search Card (Left) -->
-      <div class="{% if not user.is_authenticated %}col-sm-6 col-md-4{% elif user.is_authenticated and user.is_recruiter %}col-sm-6 col-md-4{% else %}col-sm-6 col-md-6{% endif %} mb-4">
-        <div class="card h-100 shadow border card-hover-lift">
-          <div class="card-body">
-            {% if user.is_authenticated and user.is_recruiter %}
-              <h5 class="card-title">Find Candidates</h5>
-              <p class="card-text">Search candidate profiles and filter by skills, location, and projects.</p>
-              <a href="{% url 'recommended.candidate_search' %}" class="btn btn-primary">Find Candidates</a>
-            {% else %}
-              <h5 class="card-title">Find Your Next Job</h5>
-              <p class="card-text">Browse countless job listings to find the perfect fit for you.</p>
-              <a href="{% url 'jobs.index' %}" class="btn btn-primary">Search Jobs</a>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      
-      <!-- Sign In Card (Middle - only show when not logged in) -->
-      {% if not user.is_authenticated %}
-      <div class="col-sm-6 col-md-4 mb-4">
-        <div class="card h-100 shadow border card-hover-lift">
-          <div class="card-body">
-            <h5 class="card-title">Get Started</h5>
-            <p class="card-text">Sign in to your account to manage your profile and applications.</p>
-            <a href="{% url 'accounts.login' %}" class="btn btn-primary">Sign In</a>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      
-      <!-- Recommendations Card (Right) -->
-      <div class="{% if not user.is_authenticated %}col-sm-12 col-md-4{% elif user.is_authenticated and user.is_recruiter %}col-sm-6 col-md-4{% else %}col-sm-6 col-md-6{% endif %} mb-4">
-        <div class="card h-100 shadow border card-hover-lift">
-          <div class="card-body">
-            <h5 class="card-title">Personalized Recommendations</h5>
-            {% if user.is_authenticated %}
-              {% if user.is_recruiter %}
-                {# Recruiters: go to aggregated recommendations overview #}
-                <p class="card-text">Find qualified applicants based on their skills and profile.</p>
-                <a href="{% url 'recommended.overview' %}" class="btn btn-primary">View Candidate Recommendations</a>
-              {% elif user.is_seeker %}
-                <p class="card-text">Find job recommendations based on your skills and profile.</p>
-                <a href="{% url 'recommended.index' %}" class="btn btn-primary">View Recommendations</a>
-              {% endif %}
-            {% else %}
-              <p class="card-text">Get personalized job recommendations based on your skills and profile.</p>
-              <a href="{% url 'accounts.login' %}" class="btn btn-primary">View Recommendations</a>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      
-      <!-- Recruiter Job Management Card (only show for authenticated recruiters) -->
-      {% if user.is_authenticated and user.is_recruiter %}
-      <div class="col-sm-12 col-md-4 mb-4">
-        <div class="card h-100 shadow border card-hover-lift">
-          <div class="card-body">
-            <h5 class="card-title">Manage My Job Postings</h5>
-            <p class="card-text">View and edit the jobs you've posted to find the best candidates.</p>
-            <a href="{% url 'recruiter_jobs' %}" class="btn btn-primary">View My Jobs</a>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-    </div>
+    <a href="{% url 'jobs.index' %}" class="btn hero-btn explore-jobs btn-lg">Explore Jobs</a>
+    
+    {% if user.is_authenticated and user.is_recruiter %}
+      <a href="{% url 'recommended.candidate_search' %}" class="btn hero-btn find-candidates btn-lg">Find Candidates</a>
+    {% endif %}
   </div>
-</div>
+</section>
 {% endblock content %}

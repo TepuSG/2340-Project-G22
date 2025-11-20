@@ -1,44 +1,93 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="p-3 mt-4">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card shadow p-3 mb-4 rounded">
-          <div class="card-body">
-            <h2>Login</h2>
-            <hr />
-            {% if template_data.error %}
-            <div class="alert alert-danger" role="alert">
-              {{ template_data.error }}
-            </div>
-            {% endif %}
-            <form method="POST">
-              {% csrf_token %}
-              <p>
-                <label for="username">Username</label>
-                <input id="username" type="text"
-                       name="username" required
-                       autocomplete="username"
-                       class="form-control">
-              </p>
-              <p>
-                <label for="password">Password</label>
-                <input id="password" type="password"
-                       name="password" required
-                       autocomplete="current-password"
-                       class="form-control">
-              </p>
-              <div class="text-center">
-                <button type="submit"
-                  class="btn bg-dark text-white">Login
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+<style>
+  body {
+    background: linear-gradient(120deg, #74ABE2, #5563DE);
+    min-height: 100vh;
+  }
+  .auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 15px;
+  }
+  .auth-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+  }
+  .auth-tabs {
+    display: flex;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+    border-radius: 15px 15px 0 0;
+    overflow: hidden;
+  }
+  .auth-tabs a {
+    flex: 1;
+    text-align: center;
+    padding: 12px 0;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    color: #555;
+    background: #f1f1f1; /* Light background for inactive tab */
+  }
+  .auth-tabs a.active {
+    color: #fff;
+    background: #5563DE; /* Dark active tab */
+  }
+  .auth-tabs a:hover {
+    color: #fff;
+    background: #3a4bbf;
+  }
+  .auth-card input.form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+  .auth-card .btn {
+    border-radius: 25px;
+    padding: 10px 25px;
+    font-weight: 600;
+    background: #5563DE;
+    color: #fff;
+    border: none;
+    transition: all 0.3s;
+  }
+  .auth-card .btn:hover {
+    background: #3a4bbf;
+  }
+  .text-danger { font-size: 0.875rem; }
+</style>
+
+<div class="auth-container">
+  <div class="auth-card">
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <a href="{% url 'accounts.login' %}" class="active">Login</a>
+      <a href="{% url 'accounts.signup' %}">Sign Up</a>
     </div>
+
+    <!-- Login Form -->
+    <h2 class="mb-3 text-center">Login</h2>
+    {% if template_data.error %}
+      <div class="alert alert-danger" role="alert">{{ template_data.error }}</div>
+    {% endif %}
+    <form method="POST">
+      {% csrf_token %}
+      <input id="username" type="text" name="username" placeholder="Username" required autocomplete="username" class="form-control">
+      <input id="password" type="password" name="password" placeholder="Password" required autocomplete="current-password" class="form-control">
+      <div class="text-center mt-3">
+        <button type="submit" class="btn">Login</button>
+      </div>
+    </form>
+
   </div>
 </div>
 {% endblock content %}

@@ -3,10 +3,10 @@
 {% block content %}
 <div class="container mt-4">
   <h1 class="mb-3">Candidate Search</h1>
-
   <p class="text-muted">Search candidates by skills, location, and project keywords.</p>
 
-  <form method="get" class="mb-3">
+  <!-- Search Form -->
+  <form method="get" class="mb-4">
     <div class="row g-2">
       <div class="col-md-4">
         <input name="skills" value="{{ filters.skills|default:'' }}" class="form-control" placeholder="Skill (e.g. Python, React)">
@@ -24,27 +24,28 @@
   </form>
 
   {% if user.is_authenticated and user.is_recruiter %}
-    <div class="mb-3">
-      <form method="post" action="{% url 'recommended.save_search' %}" class="row g-2 align-items-center">
-        {% csrf_token %}
-        <div class="col-auto">
-          <input type="text" name="name" class="form-control form-control-sm" placeholder="Name for saved search (optional)" value="" style="min-width:220px;">
-        </div>
-        <div class="col-auto">
-          <input type="text" name="skills" class="form-control form-control-sm" placeholder="Skills (comma-separated)" value="{{ filters.skills|default:'' }}" style="min-width:220px;">
-        </div>
-        <div class="col-auto">
-          <input type="text" name="location" class="form-control form-control-sm" placeholder="Location" value="{{ filters.location|default:'' }}" style="min-width:180px;">
-        </div>
-        <div class="col-auto">
-          <input type="text" name="projects" class="form-control form-control-sm" placeholder="Project keywords" value="{{ filters.projects|default:'' }}" style="min-width:180px;">
-        </div>
-        <div class="col-auto">
-          <button class="btn btn-sm btn-outline-primary">Save Search</button>
-          <a class="btn btn-sm btn-secondary ms-2" href="{% url 'recommended.saved_searches' %}">Saved searches</a>
-        </div>
-      </form>
-    </div>
+  <!-- Save Search Form -->
+  <div class="mb-3">
+    <form method="post" action="{% url 'recommended.save_search' %}" class="row g-2 align-items-center">
+      {% csrf_token %}
+      <div class="col-auto">
+        <input type="text" name="name" class="form-control form-control-sm" placeholder="Name for saved search (optional)" style="min-width:220px;">
+      </div>
+      <div class="col-auto">
+        <input type="text" name="skills" class="form-control form-control-sm" placeholder="Skills (comma-separated)" value="{{ filters.skills|default:'' }}" style="min-width:220px;">
+      </div>
+      <div class="col-auto">
+        <input type="text" name="location" class="form-control form-control-sm" placeholder="Location" value="{{ filters.location|default:'' }}" style="min-width:180px;">
+      </div>
+      <div class="col-auto">
+        <input type="text" name="projects" class="form-control form-control-sm" placeholder="Project keywords" value="{{ filters.projects|default:'' }}" style="min-width:180px;">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-outline-primary">Save Search</button>
+        <a class="btn btn-sm btn-secondary ms-2" href="{% url 'recommended.saved_searches' %}">Saved searches</a>
+      </div>
+    </form>
+  </div>
   {% endif %}
 
   {% if not candidates %}
@@ -52,30 +53,109 @@
   {% else %}
     <div class="row">
       {% for item in candidates %}
-        <div class="col-12 mb-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">
-                {% if item.profile.user.get_full_name %}
-                  {{ item.profile.user.get_full_name }}
-                {% else %}
-                  {{ item.profile.user.username }}
-                {% endif %}
-              </h5>
-              {% if item.profile.skills %}
-                <p class="mb-1"><strong>Skills:</strong> {{ item.profile.skills }}</p>
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card candidate-card h-100 d-flex flex-column">
+          <div class="card-body d-flex flex-column">
+            <!-- Candidate Name -->
+            <h5 class="card-title candidate-name">
+              {% if item.profile.user.get_full_name %}
+                {{ item.profile.user.get_full_name }}
+              {% else %}
+                {{ item.profile.user.username }}
               {% endif %}
-              {% if item.matches %}
-                <p class="mb-1"><strong>Matched skills:</strong> {{ item.matches|join:", " }}</p>
-              {% endif %}
-              <div class="mt-3">
-                <a href="{% url 'profiles:detail' item.profile.user.username %}" class="btn btn-sm btn-primary">See profile</a>
-              </div>
+            </h5>
+
+            <!-- Candidate Skills -->
+            {% if item.profile.skills_list %}
+            <div class="candidate-skills mb-2">
+              {% for skill in item.profile.skills_list %}
+                <span class="skill-tag">{{ skill }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Matched Skills -->
+            {% if item.matches %}
+            <p class="mb-1"><strong>Matched skills:</strong> {{ item.matches|join:", " }}</p>
+            {% endif %}
+
+            <!-- Matched Jobs -->
+            {% if item.matched_jobs %}
+            <p class="mb-1"><strong>Matched jobs:</strong> {{ item.matched_jobs|join:", " }}</p>
+            {% endif %}
+
+            <!-- Action Button -->
+            <div class="mt-auto">
+              <a href="{% url 'profiles:detail' item.profile.user.username %}" class="btn btn-job">See Profile</a>
             </div>
           </div>
         </div>
+      </div>
       {% endfor %}
     </div>
   {% endif %}
 </div>
+
+<!-- Candidate Card CSS -->
+<style>
+/* Candidate Card */
+.candidate-card {
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    background-color: #ffffff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Hover effect */
+.candidate-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+/* Candidate Name */
+.candidate-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+/* Skills as tags */
+.skill-tag {
+    display: inline-block;
+    background: #f0f4ff;
+    color: #1a73e8;
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 8px;
+    margin: 2px 3px 2px 0;
+}
+
+/* Card Details */
+.card-body p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+/* Buttons */
+.btn-job {
+    background-color: #1a73e8;
+    color: white;
+    border-radius: 10px;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+    padding: 6px 0;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-job:hover {
+    background-color: #155ab6;
+    transform: translateY(-2px);
+}
+</style>
+
 {% endblock content %}
