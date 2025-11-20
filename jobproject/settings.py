@@ -150,10 +150,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "jobproject/static/",
 ]
 
-GOOGLE_REDIRECT_URI = "http://localhost:8000/accounts/oauth/callback/"
+import os
 
-
-GOOGLE_CLIENT_ID = (
-    "154022940798-en0g0ajsvv2gqh5edsqbus11bk4aptjh.apps.googleusercontent.com"
-)
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
