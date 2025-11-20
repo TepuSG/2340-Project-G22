@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .role-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .role-buttons {
+        display: flex;
+        gap: 40px;
+        margin-top: 20px;
+    }
+
+    .role-button {
+        width: 300px;
+        height: 300px;
+        font-size: 2rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        background-color: #4a90e2;
+        color: white;
+    }
+
+    .role-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        background-color: #357ABD;
+    }
+
+    .error-message {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<div class="role-container">
+    <h2>Select Your Role</h2>
+    {% if error %}
+      <p class="error-message">{{ error }}</p>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        <div class="role-buttons">
+            <button type="submit" name="role" value="seeker" class="role-button">Seeker</button>
+            <button type="submit" name="role" value="recruiter" class="role-button">Recruiter</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

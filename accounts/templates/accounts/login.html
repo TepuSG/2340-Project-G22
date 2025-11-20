@@ -1,93 +1,229 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load static %}
 <style>
-  body {
+/* --- VERTICAL DIVIDER WITH OR --- */
+.divider-wrapper {
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  flex-direction: column;
+}
+
+.divider-line-top,
+.divider-line-bottom {
+  width: 2px;
+  background: rgba(255,255,255,0.75);
+  border-radius: 2px;
+}
+
+.divider-line-top {
+  height: 40%;
+}
+
+.divider-line-bottom {
+  height: 40%;
+}
+
+.divider-text {
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 6px 10px;
+    margin: 8px 0;
+    z-index: 2;
+    text-align: center;
+}
+
+body {
     background: linear-gradient(120deg, #74ABE2, #5563DE);
     min-height: 100vh;
-  }
-  .auth-container {
+}
+
+.auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 60px 15px;
-  }
-  .auth-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.auth-wrapper {
+    display: flex;
     width: 100%;
-    max-width: 500px;
-    padding: 30px;
-  }
-  .auth-tabs {
+    max-width: 1100px;
+    gap: 40px;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 18px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+    width: 100%;
+    padding: 35px;
+}
+
+.auth-left, .auth-right {
+    width: 40%;
+    min-width: 350px;
+}
+
+/* Tabs */
+.auth-tabs {
     display: flex;
     margin-bottom: 30px;
     border-bottom: 2px solid #eee;
     border-radius: 15px 15px 0 0;
     overflow: hidden;
-  }
-  .auth-tabs a {
+}
+.auth-tabs a {
     flex: 1;
     text-align: center;
     padding: 12px 0;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s;
     color: #555;
-    background: #f1f1f1; /* Light background for inactive tab */
-  }
-  .auth-tabs a.active {
+    background: #f1f1f1;
+    transition: 0.3s;
+}
+.auth-tabs a.active {
     color: #fff;
-    background: #5563DE; /* Dark active tab */
-  }
-  .auth-tabs a:hover {
-    color: #fff;
-    background: #3a4bbf;
-  }
-  .auth-card input.form-control {
+    background: #5563DE;
+}
+
+/* Inputs + button */
+.auth-card input.form-control {
     border-radius: 10px;
     border: 1px solid #ccc;
     padding: 10px;
     margin-bottom: 15px;
-  }
-  .auth-card .btn {
+}
+.auth-card .btn {
     border-radius: 25px;
     padding: 10px 25px;
     font-weight: 600;
     background: #5563DE;
     color: #fff;
     border: none;
-    transition: all 0.3s;
-  }
-  .auth-card .btn:hover {
+    transition: 0.3s;
+}
+.auth-card .btn:hover {
     background: #3a4bbf;
-  }
-  .text-danger { font-size: 0.875rem; }
+}
+
+/* OAuth buttons */
+.oauth-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    height: 250px;
+    align-items: baseline;
+}
+
+.oauth-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 0;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    transition: all 0.3s;
+    height: 150px;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.oauth-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background: #ececec;
+}
+.oauth-btn img {
+    width: 80px;
+    height: 80px;
+}
+
+/* Horizontal OR */
+.oauth-horizontal-or {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 15px 0;
+  position: relative;
+}
+.oauth-horizontal-or::before,
+.oauth-horizontal-or::after {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.7);
+}
+.oauth-horizontal-or span {
+  padding: 0 10px;
+  font-weight: bold;
+  color: white;
+}
 </style>
 
 <div class="auth-container">
-  <div class="auth-card">
+  <div class="auth-wrapper">
 
-    <!-- Tabs -->
-    <div class="auth-tabs">
-      <a href="{% url 'accounts.login' %}" class="active">Login</a>
-      <a href="{% url 'accounts.signup' %}">Sign Up</a>
+    <!-- LEFT — LOGIN FORM -->
+    <div class="auth-card auth-left">
+      <div class="auth-tabs">
+        <a href="{% url 'accounts.login' %}" class="active">Login</a>
+        <a href="{% url 'accounts.signup' %}">Sign Up</a>
+      </div>
+
+      <h2 class="mb-3 text-center">Login</h2>
+      {% if template_data.error %}
+        <div class="alert alert-danger">{{ template_data.error }}</div>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        <input id="username" type="text" name="username" placeholder="Username" required class="form-control">
+        <input id="password" type="password" name="password" placeholder="Password" required class="form-control">
+
+        <div class="text-center mt-3">
+          <button class="btn" type="submit">Login</button>
+        </div>
+      </form>
     </div>
 
-    <!-- Login Form -->
-    <h2 class="mb-3 text-center">Login</h2>
-    {% if template_data.error %}
-      <div class="alert alert-danger" role="alert">{{ template_data.error }}</div>
-    {% endif %}
-    <form method="POST">
-      {% csrf_token %}
-      <input id="username" type="text" name="username" placeholder="Username" required autocomplete="username" class="form-control">
-      <input id="password" type="password" name="password" placeholder="Password" required autocomplete="current-password" class="form-control">
-      <div class="text-center mt-3">
-        <button type="submit" class="btn">Login</button>
+    <!-- CENTER — VERTICAL OR DIVIDER -->
+    <div class="divider-wrapper">
+      <div class="divider-line-top"></div>
+      <div class="divider-text">OR</div>
+      <div class="divider-line-bottom"></div>
+    </div>
+
+    <!-- RIGHT — OAUTH -->
+    <div class="auth-card auth-right text-center">
+      <h4 class="mb-4">Continue with</h4>
+      <div class="oauth-row">
+        <div class="oauth-btn google" id="google-oauth">
+          <img src="{% static 'img/google.png' %}" alt="Google"> 
+        </div>
+        <div class="oauth-btn github" id="github-oauth">
+          <img src="{% static 'img/git.png' %}" alt="GitHub"> 
+        </div>
       </div>
-    </form>
+    </div>
 
   </div>
 </div>
+
+<script>
+document.getElementById('google-oauth').addEventListener('click', function() {
+    window.location.href = "{% url 'google_oauth_start_login' %}";
+});
+</script>
+
 {% endblock content %}

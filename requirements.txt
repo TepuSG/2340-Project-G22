@@ -1,3 +1,4 @@
 django
 django-mapbox-location-field
 requests
+python-jose

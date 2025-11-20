@@ -5,20 +5,35 @@
     background: linear-gradient(120deg, #74ABE2, #5563DE);
     min-height: 100vh;
   }
+
   .auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 60px 15px;
   }
+
+  .auth-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    gap: 40px;
+  }
+
   .auth-card {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    border-radius: 18px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.25);
     width: 100%;
-    max-width: 500px;
-    padding: 30px;
+    padding: 35px;
   }
+
+  .auth-left, .auth-right {
+    width: 40%;
+    min-width: 350px;
+  }
+
+  /* Tabs */
   .auth-tabs {
     display: flex;
     margin-bottom: 30px;
@@ -32,18 +47,16 @@
     padding: 12px 0;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s;
     color: #555;
-    background: #f1f1f1; /* Light background for inactive tab */
+    background: #f1f1f1;
+    transition: 0.3s;
   }
   .auth-tabs a.active {
     color: #fff;
-    background: #5563DE; /* Dark active tab */
+    background: #5563DE;
   }
-  .auth-tabs a:hover {
-    color: #fff;
-    background: #3a4bbf;
-  }
+
+  /* Inputs + button */
   .auth-card input.form-control {
     border-radius: 10px;
     border: 1px solid #ccc;
@@ -63,46 +76,135 @@
     background: #3a4bbf;
   }
   .text-danger { font-size: 0.875rem; }
+
+  /* OAuth Buttons Row */
+  .oauth-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .oauth-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 0;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    transition: all 0.3s;
+    height: 150px;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  .oauth-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    background: #ececec;
+  }
+  .oauth-btn img {
+    width: 80px;
+    height: 80px;
+  }
+  .oauth-btn.google { color: black; }
+  .oauth-btn.github { color: #333; }
+
+  /* Vertical OR divider between form and OAuth */
+  .divider-wrapper {
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    flex-direction: column;
+  }
+  .divider-line-top,
+  .divider-line-bottom {
+    width: 2px;
+    background: rgba(255,255,255,0.75);
+    border-radius: 2px;
+  }
+  .divider-line-top { height: 40%; }
+  .divider-line-bottom { height: 40%; }
+  .divider-text {
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 6px 10px;
+    margin: 8px 0;
+    z-index: 2;
+    text-align: center;
+  }
+
 </style>
 
 <div class="auth-container">
-  <div class="auth-card">
+  <div class="auth-wrapper">
 
-    <!-- Tabs -->
-    <div class="auth-tabs">
-      <a href="{% url 'accounts.login' %}">Login</a>
-      <a href="{% url 'accounts.signup' %}" class="active">Sign Up</a>
+    <!-- LEFT — SIGNUP FORM -->
+    <div class="auth-card auth-left">
+      <div class="auth-tabs">
+        <a href="{% url 'accounts.login' %}">Login</a>
+        <a href="{% url 'accounts.signup' %}" class="active">Sign Up</a>
+      </div>
+
+      <h2 class="mb-3 text-center">Sign Up</h2>
+      <form method="POST" novalidate>
+        {% csrf_token %}
+        <input type="text" name="{{ template_data.form.username.name }}" placeholder="Username" class="form-control" value="{{ template_data.form.username.value|default_if_none:'' }}">
+        {% if template_data.form.username.errors %}<div class="text-danger">{{ template_data.form.username.errors }}</div>{% endif %}
+
+        <div class="mb-3 mt-2">
+          <label class="form-label d-block">I am a...</label>
+          {% for radio in template_data.form.role %}
+            <div class="form-check form-check-inline">
+              {{ radio.tag }}
+              <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+            </div>
+          {% endfor %}
+          {% if template_data.form.role.errors %}<div class="text-danger">{{ template_data.form.role.errors }}</div>{% endif %}
+        </div>
+
+        <input type="password" name="{{ template_data.form.password1.name }}" placeholder="Password" class="form-control">
+        {% if template_data.form.password1.errors %}<div class="text-danger">{{ template_data.form.password1.errors }}</div>{% endif %}
+
+        <input type="password" name="{{ template_data.form.password2.name }}" placeholder="Confirm Password" class="form-control">
+        {% if template_data.form.password2.errors %}<div class="text-danger">{{ template_data.form.password2.errors }}</div>{% endif %}
+
+        <div class="text-center mt-3">
+          <button type="submit" class="btn">Sign Up</button>
+        </div>
+      </form>
     </div>
 
-    <!-- Sign Up Form -->
-    <h2 class="mb-3 text-center">Sign Up</h2>
-    <form method="POST" novalidate>
-      {% csrf_token %}
-      <input type="text" name="{{ template_data.form.username.name }}" placeholder="Username" class="form-control" value="{{ template_data.form.username.value|default_if_none:'' }}">
-      {% if template_data.form.username.errors %}<div class="text-danger">{{ template_data.form.username.errors }}</div>{% endif %}
+    <!-- CENTER — VERTICAL OR DIVIDER -->
+    <div class="divider-wrapper">
+      <div class="divider-line-top"></div>
+      <div class="divider-text">OR</div>
+      <div class="divider-line-bottom"></div>
+    </div>
 
-      <div class="mb-3 mt-2">
-        <label class="form-label d-block">I am a...</label>
-        {% for radio in template_data.form.role %}
-          <div class="form-check form-check-inline">
-            {{ radio.tag }}
-            <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-          </div>
-        {% endfor %}
-        {% if template_data.form.role.errors %}<div class="text-danger">{{ template_data.form.role.errors }}</div>{% endif %}
+    <!-- RIGHT — OAUTH -->
+    <div class="auth-card auth-right text-center">
+      <h4 class="mb-4">Continue with</h4>
+      <div class="oauth-row">
+        {% load static %}
+        <a href=" {% url 'role_selection' %}" class="oauth-btn google">
+          <img src="{% static 'img/google.png' %}" alt="Google"> 
+        </a>
+        <a class="oauth-btn github">
+          <img src="{% static 'img/git.png' %}" alt="GitHub"> 
+        </a>
       </div>
-
-      <input type="password" name="{{ template_data.form.password1.name }}" placeholder="Password" class="form-control">
-      {% if template_data.form.password1.errors %}<div class="text-danger">{{ template_data.form.password1.errors }}</div>{% endif %}
-
-      <input type="password" name="{{ template_data.form.password2.name }}" placeholder="Confirm Password" class="form-control">
-      {% if template_data.form.password2.errors %}<div class="text-danger">{{ template_data.form.password2.errors }}</div>{% endif %}
-
-      <div class="text-center mt-3">
-        <button type="submit" class="btn">Sign Up</button>
-      </div>
-    </form>
+    </div>
 
   </div>
 </div>
+
+
 {% endblock content %}
