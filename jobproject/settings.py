@@ -152,9 +152,16 @@ STATICFILES_DIRS = [
 
 import os
 
-GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.getenv(
+    "GOOGLE_REDIRECT_URI", "http://localhost:8000/accounts/oauth/callback/"
+)
+GOOGLE_CLIENT_ID = os.getenv(
+    "GOOGLE_CLIENT_ID",
+    "154022940798-en0g0ajsvv2gqh5edsqbus11bk4aptjh.apps.googleusercontent.com",
+)
+GOOGLE_CLIENT_SECRET = os.getenv(
+    "GOOGLE_CLIENT_SECRET", "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"
+)
 GROQ_API_KEY = os.getenv(
     "GROQ_API_KEY", "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"
 )
