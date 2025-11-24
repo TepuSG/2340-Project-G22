@@ -10,13 +10,21 @@ from .models import Job
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from application.models import Application
+from django.contrib.auth import get_user_model
 
 
 def available_jobs(request):
     # Reuse the home.index template rendering pattern
+
+    if request.user.is_recruiter:
+        print("recruiter here ")
+        return recruiter_jobs(request)
+
     template_data = {}
-    template_data["title"] = "Available Jobs"
     template_data["jobs"] = Job.objects.all()
+
+    template_data["title"] = "Available Jobs"
+
     return render(request, "jobs/index.html", {"template_data": template_data})
 
 
