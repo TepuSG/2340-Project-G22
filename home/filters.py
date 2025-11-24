@@ -56,7 +56,6 @@ class VisaSponsorshipFilter(Filterable):
         return qs
 
 
-from groq import Groq
 from django.conf import settings
 
 
@@ -67,6 +66,8 @@ class AISearchFilter(Filterable):
         value: the search input (title/query)
         request: needed to get the current user
         """
+        from groq import Groq
+
         print("in the AI filter")
 
         # Build a concise prompt for the AI
