@@ -1,6 +1,16 @@
 from django import forms
 from django.forms import inlineformset_factory
+from django.contrib.auth import get_user_model
 from .models import Profile, ProfileEducation, ProfileExperience, ProfileLink
+
+User = get_user_model()
+
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ['email']
 
 
 class ProfileForm(forms.ModelForm):

@@ -29,7 +29,10 @@
       {% if user.is_recruiter %}
         <a href="{% url 'edit_job' job.id %}" class="btn btn-job mt-auto">Edit Job</a>
       {% elif user.is_authenticated and user.is_seeker %}
-        <a href="{% url 'apply_to_job' job.id %}" class="btn btn-job mt-auto">Apply Now</a>
+        <div class="d-flex gap-2 mt-auto">
+            <a href="{% url 'apply_to_job' job.id %}" class="btn btn-job flex-grow-1">Apply Now</a>
+            <a href="{% url 'messaging:conversation' job.recruiter.username %}" class="btn btn-outline-primary">Message</a>
+        </div>
       {% else %}
         <a href="{% url 'accounts.login' %}?next={% url 'apply_to_job' job.id %}" class="btn btn-job mt-auto">Apply Now</a>
       {% endif %}

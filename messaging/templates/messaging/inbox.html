@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Messages</h2>
+    <div class="list-group">
+        {% for conversation in conversations %}
+            <a href="{% url 'messaging:conversation' conversation.user.username %}" class="list-group-item list-group-item-action {% if conversation.unread %}list-group-item-primary{% endif %}">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ conversation.user.username }}</h5>
+                    <small>{{ conversation.last_message.timestamp|timesince }} ago</small>
+                </div>
+                <p class="mb-1">{{ conversation.last_message.body|truncatechars:50 }}</p>
+            </a>
+        {% empty %}
+            <p>No messages yet.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

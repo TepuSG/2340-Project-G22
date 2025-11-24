@@ -28,6 +28,8 @@
               <p class="mb-0"><strong>Matched jobs:</strong> {{ item.matched_jobs|join:", " }}</p>
               <div class="mt-3">
                 <a href="{% url 'profiles:detail' item.profile.user.username %}" class="btn btn-sm btn-primary">See profile</a>
+                <a href="{% url 'messaging:conversation' item.profile.user.username %}" class="btn btn-sm btn-outline-primary">Message</a>
+                <a href="{% url 'messaging:send_email' item.profile.user.username %}" class="btn btn-sm btn-outline-secondary">Email</a>
               </div>
             </div>
           </div>

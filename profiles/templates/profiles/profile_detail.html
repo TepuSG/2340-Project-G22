@@ -29,18 +29,26 @@
             </div>
             <div class="col-md-4 text-md-end">
               {% if user.is_recruiter %}
-                <div class="dropdown">
-                  <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-ellipsis-v me-2"></i>Actions
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{% url 'recommended.candidate_search' %}">
-                      <i class="fas fa-search me-2"></i>Back to Search
-                    </a></li>
-                    <li><a class="dropdown-item" href="{% url 'recommended.overview' %}">
-                      <i class="fas fa-users me-2"></i>All Candidates
-                    </a></li>
-                  </ul>
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'messaging:conversation' profile.user.username %}" class="btn btn-primary">
+                        <i class="fas fa-comment me-2"></i>Message
+                    </a>
+                    <a href="{% url 'messaging:send_email' profile.user.username %}" class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-2"></i>Email
+                    </a>
+                    <div class="dropdown">
+                      <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v me-2"></i>Actions
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'recommended.candidate_search' %}">
+                          <i class="fas fa-search me-2"></i>Back to Search
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'recommended.overview' %}">
+                          <i class="fas fa-users me-2"></i>All Candidates
+                        </a></li>
+                      </ul>
+                    </div>
                 </div>
               {% endif %}
             </div>

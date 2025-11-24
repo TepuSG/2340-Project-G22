@@ -3,3 +3,4 @@ django-mapbox-location-field
 requests
 python-jose
 groq
+python-dotenv
