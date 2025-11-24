@@ -11,7 +11,6 @@ from .models import CustomUser
 
 User = get_user_model()
 from django.conf import settings
-from jose import jwt
 
 
 @login_required
