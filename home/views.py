@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from jobs.models import Job
 
-
 def index(request, **kwargs):
     template_data = {}
-    template_data["title"] = "Job Board Home"
+    template_data['title'] = 'Job Board Home'
     load_extra_context(kwargs, template_data)
-    print("template data for index is", template_data)
-    return render(request, "home/index.html", {"template_data": template_data})
+    print('template data for index is', template_data)
+    return render(request, 'home/index.html', {'template_data': template_data})
 
 
 def load_extra_context(kwargs, template_data):
@@ -18,13 +17,5 @@ def load_extra_context(kwargs, template_data):
 
 def filters(request):
     from .filters import FilterOrchestrator
-
-    print("doingthe filter ")
-
     jobs = FilterOrchestrator().apply_filters(Job.objects.all(), request.GET)
-    print(jobs)
-    if request.GET["name"] == "ai":
-        print("returning the ai prompt back")
-        return index(request, jobs=jobs, page="ai")
-    print("no ai")
     return index(request, jobs=jobs)

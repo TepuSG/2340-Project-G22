@@ -88,10 +88,13 @@ def index(request):
 @login_required
 def recruiter_overview(request):
     from profiles.models import Profile
+    from django.contrib.auth import get_user_model
 
     # Only recruiters may access this overview
     if not getattr(request.user, "is_recruiter", False):
         return HttpResponseForbidden()
+
+    User = get_user_model()
 
     # Jobs posted by the recruiter
     jobs = Job.objects.filter(recruiter=request.user)
@@ -125,7 +128,7 @@ def recruiter_overview(request):
         )
 
     # Candidate pool
-    candidates_qs = Profile.objects.exclude(skills__isnull=True).exclude(
+    candidates_qs = Profile.objects.filter(user__role=User.Roles.SEEKER).exclude(skills__isnull=True).exclude(
         skills__exact=""
     )
 
@@ -167,13 +170,16 @@ def candidate_search(request):
     Returns a page with a filter form and results. Only recruiters allowed.
     """
     from profiles.models import Profile
+    from django.contrib.auth import get_user_model
 
     if not getattr(request.user, "is_recruiter", False):
         return HttpResponseForbidden()
 
+    User = get_user_model()
+
     # Base queryset: show all public seekers by default
     # (Assumption: only public profiles should be visible in search — change to `Profile.objects.all()` if you want truly all)
-    candidates_qs = Profile.objects.filter(is_public=True)
+    candidates_qs = Profile.objects.filter(is_public=True, user__role=User.Roles.SEEKER)
 
     # Gather filters from GET
     filter_params = {

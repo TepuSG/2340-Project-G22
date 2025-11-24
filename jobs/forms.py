@@ -9,6 +9,7 @@ class JobForm(forms.ModelForm):
         model = Job
         fields = [
             "title",
+            "description",
             "skills",
             "location",
             "salary",
@@ -22,6 +23,14 @@ class JobForm(forms.ModelForm):
                     "class": "form-control",
                     "placeholder": "e.g., Senior Software Engineer, Marketing Manager",
                     "maxlength": "200",
+                }
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Describe the role, responsibilities, and requirements...",
+                    "rows": 6,
+                    "help_text": "Provide a detailed description of the job position.",
                 }
             ),
             "skills": forms.Textarea(
@@ -55,6 +64,7 @@ class JobForm(forms.ModelForm):
 
         labels = {
             "title": "Job Title",
+            "description": "Job Description",
             "skills": "Required Skills",
             "location": "Location",
             "salary": "Annual Salary (USD)",
@@ -64,6 +74,7 @@ class JobForm(forms.ModelForm):
 
         help_texts = {
             "title": "Enter a clear, descriptive job title that candidates will easily understand.",
+            "description": "Provide a comprehensive overview of the role, including responsibilities and expectations.",
             "skills": "List the essential skills, technologies, and qualifications needed for this role.",
             "location": "Specify the city and state where this position is based.",
             "salary": "Enter the annual salary amount in USD. This helps attract qualified candidates.",

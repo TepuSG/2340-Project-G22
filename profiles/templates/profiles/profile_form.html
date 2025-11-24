@@ -148,31 +148,46 @@
 
           <form method="post" action="{% url 'jobmap.update_distance' %}">
             {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
             <div class="mt-4 p-3 bg-light rounded-3 border">
-              <div class="mb-3">
-                <label for="preferred_distance" class="form-label fw-semibold">
-                  Preferred Commute Distance is {{miles}} miles
-                </label>
-                <div class="input-group input-group-lg">
-                  <input 
-                    type="number" 
-                    name="preferred_distance" 
-                    id="preferred_distance" 
-                    class="form-control" 
-                    placeholder="Enter distance" 
-                    min="0"
-                    step="0.1"
-                    required
-                    value={{miles}}
-                  >
-                  <span class="input-group-text">miles</span>
+              <h5 class="mb-3">Location Preferences</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="selected_city" class="form-label fw-semibold">Location</label>
+                  <select name="selected_city" id="selected_city" class="form-select">
+                    {% for city_code, city_name in cities %}
+                      <option value="{{ city_code }}" {% if selected_city == city_code %}selected{% endif %}>{{ city_name }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="form-text">
+                    Select a city to center your job search around.
+                  </div>
                 </div>
-                <div class="form-text">
-                  Set commute distance will be default radius on the Job Map.
+                <div class="col-md-6 mb-3">
+                  <label for="preferred_distance" class="form-label fw-semibold">
+                    Commute Distance
+                  </label>
+                  <div class="input-group">
+                    <input 
+                      type="number" 
+                      name="preferred_distance" 
+                      id="preferred_distance" 
+                      class="form-control" 
+                      placeholder="Enter distance" 
+                      min="0"
+                      step="0.1"
+                      required
+                      value="{{ miles }}"
+                    >
+                    <span class="input-group-text">miles</span>
+                  </div>
+                  <div class="form-text">
+                    Set commute distance radius.
+                  </div>
                 </div>
               </div>
               <div class="text-center mt-3">
-                <button type="submit" class="btn btn-primary px-4">Save Distance</button>
+                <button type="submit" class="btn btn-primary px-4">Save Preferences</button>
               </div>
             </div>
           </form>

@@ -83,8 +83,8 @@ def post_job(request):
 @method_decorator(login_required, name="dispatch")
 class JobUpdateView(UpdateView):
     model = Job
+    form_class = JobForm
     template_name = "jobs/edit_job.html"
-    fields = ["title", "skills", "location", "salary", "is_remote", "visa_sponsorship"]
     success_url = reverse_lazy("recruiter_jobs")
 
     def get_queryset(self):

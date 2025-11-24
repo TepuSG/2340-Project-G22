@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from .models import Profile
 from .forms import ProfileForm, EducationFormSet, ExperienceFormSet, LinkFormSet, UserUpdateForm
 from jobmap.models import CityPreference
+from jobmap.cities import get_cities_list
 
 User = get_user_model()
 
@@ -65,5 +66,7 @@ def profile_edit(request):
             "exp_fs": exp_fs,
             "link_fs": link_fs,
             "miles": city_preference.radius_miles,
+            "selected_city": city_preference.selected_city,
+            "cities": get_cities_list(),
         },
     )

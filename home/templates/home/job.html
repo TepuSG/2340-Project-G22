@@ -6,6 +6,13 @@
       <!-- Job Title -->
       <h4 class="job-title">{{ job.title }}</h4>
 
+      <!-- Job Description -->
+      {% if job.description %}
+      <p class="job-description text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+        {{ job.description }}
+      </p>
+      {% endif %}
+
       <!-- Skills -->
       {% if job.skills_list %}
       <div class="job-skills mb-3">

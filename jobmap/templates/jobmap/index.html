@@ -68,6 +68,12 @@
       </div>
       {% endif %}
 
+      {% elif user.is_authenticated %}
+      <div class="text-center p-4 border rounded bg-light">
+        <p class="h5 mb-3">Welcome, Recruiter!</p>
+        <p>Explore the map to see where candidates are located.</p>
+      </div>
+
       {% else %}
       <!-- This content is shown to unauthenticated users -->
       <div class="text-center p-4 border rounded bg-light">
@@ -102,10 +108,12 @@
   // Configuration
   const MAPBOX_KEY = "{{ MAPBOX_KEY }}";
   const jobs = JSON.parse('{{ jobs_json|escapejs }}');
+  const candidates = {% if candidates_json %}{{ candidates_json|safe }}{% else %}[]{% endif %};
   const selectedCityCoords = {% if selected_city_coords %}{{ selected_city_coords|safe }}{% else %}null{% endif %};
   const searchRadius = {% if city_preference and city_preference.radius_miles %}{{ city_preference.radius_miles }}{% else %}null{% endif %};
 
   console.log('Jobs data count:', Array.isArray(jobs) ? jobs.length : 'unknown');
+  console.log('Candidates data count:', candidates.length);
   console.log('Selected city coordinates:', selectedCityCoords);
   console.log('Search radius:', searchRadius, 'miles');
 
@@ -280,11 +288,41 @@
     }
   }
 
+  // Add candidate markers
+  function addCandidateMarkers() {
+    if (!map) return;
+    
+    candidates.forEach(candidate => {
+        const popupContent = `
+          <div style="max-width: 250px;">
+            <strong>${candidate.username}</strong><br>
+            <small><i class="fas fa-map-marker-alt"></i> ${candidate.city}</small><br>
+            <a href="${candidate.profile_url}" class="btn btn-sm btn-primary w-100 mt-2">
+              View Profile
+            </a>
+          </div>
+        `;
+
+        // Add a slight random offset to prevent exact overlap if multiple candidates are in the same city
+        const offset = (Math.random() - 0.5) * 0.01; 
+        
+        new mapboxgl.Marker({ color: '#007bff' }) // Blue for candidates
+          .setLngLat([candidate.lng + offset, candidate.lat + offset])
+          .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
+          .addTo(map);
+    });
+    console.log(`Added ${candidates.length} candidate markers`);
+  }
+
   // Initialize map content when loaded
   if (map) {
     map.on('load', () => {
       addCityMarkerAndRadius();
-      addJobMarkers();
+      if (candidates.length > 0) {
+          addCandidateMarkers();
+      } else {
+          addJobMarkers();
+      }
     });
   }
 

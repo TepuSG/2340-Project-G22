@@ -8,8 +8,10 @@ from accounts.decorators import seeker_required
 from accounts.models import SeekerProfile
 from .models import CityPreference
 from .cities import get_city_coordinates, get_cities_list
+from django.urls import reverse
 import json
 import math
+from django.contrib.auth import get_user_model
 
 
 class SomeLocationModel(models.Model):
@@ -58,6 +60,35 @@ def index(request):
     jobs_qs = Job.objects.all().values("id", "title", "location", "salary", "is_remote")
     jobs = list(jobs_qs)
 
+    candidates = []
+    if request.user.is_authenticated and request.user.is_recruiter:
+        # Fetch candidates with city preferences
+        # Ensure we only get Seekers and exclude the current user (just in case)
+        prefs = CityPreference.objects.filter(
+            user__role='SEEKER'
+        ).exclude(
+            user__role='RECRUITER'
+        ).exclude(
+            user=request.user
+        ).exclude(
+            selected_city="N/A"
+        ).select_related('user')
+        
+        for pref in prefs:
+            # Double check role
+            if pref.user.is_recruiter:
+                continue
+                
+            lat, lng = get_city_coordinates(pref.selected_city)
+            if lat and lng:
+                candidates.append({
+                    "username": pref.user.username,
+                    "city": pref.selected_city,
+                    "lat": lat,
+                    "lng": lng,
+                    "profile_url": reverse('profiles:detail', args=[pref.user.username])
+                })
+
     template_data = {
         "title": "Job Map - City-Based Search",
     }
@@ -66,6 +97,7 @@ def index(request):
         "template_data": template_data,
         "jobs": jobs,
         "jobs_json": json.dumps(jobs),
+        "candidates_json": json.dumps(candidates),
         "cities_choices": get_cities_list(),
         "city_preference": city_preference,
         "selected_city_coords": selected_city_coords,
@@ -109,4 +141,7 @@ def update_distance(request):
         except (TypeError, ValueError):
             return HttpResponseForbidden("Invalid distance value.")
 
+    next_url = request.POST.get("next")
+    if next_url:
+        return redirect(next_url)
     return redirect("jobmap.index")

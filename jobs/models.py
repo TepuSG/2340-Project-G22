@@ -10,6 +10,7 @@ class Job(models.Model):
     skills = models.TextField()
     location = models.CharField(max_length=300)
     salary = models.IntegerField()
+    description = models.TextField(default="")
     is_remote = models.BooleanField(default=False)
     visa_sponsorship = models.BooleanField(default=False)
     created_date = models.DateTimeField(default=timezone.now)
