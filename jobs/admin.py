@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.http import HttpResponse
+import csv
 from .models import Job
 
 # Custom Job Admin for User Story 20: Job Post Moderation
@@ -22,7 +24,22 @@ class JobAdmin(admin.ModelAdmin):
     )
     
     # Add moderation actions
-    actions = ['approve_jobs', 'remove_jobs', 'flag_for_review']
+    actions = ['export_as_csv', 'approve_jobs', 'remove_jobs', 'flag_for_review']
+    
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename={meta}.csv'
+        writer = csv.writer(response)
+        
+        writer.writerow(field_names)
+        for obj in queryset:
+            writer.writerow([getattr(obj, field) for field in field_names])
+        
+        return response
+    export_as_csv.short_description = "Download selected as CSV"
     
     def approve_jobs(self, request, queryset):
         # This could set a status field if you add one later

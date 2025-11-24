@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
+import csv
 from .models import CustomUser, SeekerProfile, RecruiterProfile
 from .models import Notification
 
@@ -23,7 +25,22 @@ class CustomUserAdmin(UserAdmin):
     )
     
     # Actions for managing users
-    actions = ['activate_users', 'deactivate_users', 'make_seeker', 'make_recruiter']
+    actions = ['export_as_csv', 'activate_users', 'deactivate_users', 'make_seeker', 'make_recruiter']
+    
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename={meta}.csv'
+        writer = csv.writer(response)
+        
+        writer.writerow(field_names)
+        for obj in queryset:
+            writer.writerow([getattr(obj, field) for field in field_names])
+        
+        return response
+    export_as_csv.short_description = "Download selected as CSV"
     
     def activate_users(self, request, queryset):
         count = queryset.update(is_active=True)
@@ -50,10 +67,42 @@ class SeekerProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'distance')
     search_fields = ('user__username', 'user__email')
     list_filter = ('distance',)
+    actions = ['export_as_csv']
+    
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename={meta}.csv'
+        writer = csv.writer(response)
+        
+        writer.writerow(field_names)
+        for obj in queryset:
+            writer.writerow([getattr(obj, field) for field in field_names])
+        
+        return response
+    export_as_csv.short_description = "Download selected as CSV"
 
 class RecruiterProfileAdmin(admin.ModelAdmin):
     list_display = ('user',)
     search_fields = ('user__username', 'user__email')
+    actions = ['export_as_csv']
+    
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename={meta}.csv'
+        writer = csv.writer(response)
+        
+        writer.writerow(field_names)
+        for obj in queryset:
+            writer.writerow([getattr(obj, field) for field in field_names])
+        
+        return response
+    export_as_csv.short_description = "Download selected as CSV"
 
 # Register models
 admin.site.register(CustomUser, CustomUserAdmin)
