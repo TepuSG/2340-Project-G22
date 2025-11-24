@@ -357,7 +357,12 @@
                         </li>
                     {% endif %}
                     {% if request.user.is_authenticated and request.user.is_recruiter %}
+                        <a href="{% url 'recommended.candidate_search' %}" class="btn btn-primary ms-2">Candidates</a>
                         <a href="{% url 'post_job' %}" class="btn btn-primary ms-2">Post Job</a>
+                        <a href="{% url 'jobs.index' %}" class="btn btn-primary ms-2">Jobs</a>
+                    {% endif %}
+                    {% if request.user.is_authenticated and request.user.is_seeker %}
+                        <a href="{% url 'jobs.index' %}" class="btn btn-primary ms-2">Jobs</a>
                     {% endif %}
                 </ul>
 
