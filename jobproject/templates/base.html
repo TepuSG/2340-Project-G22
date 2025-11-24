@@ -351,11 +351,15 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'jobs.index' %}">Available Jobs</a></li>
                                 <li><a class="dropdown-item" href="{% url 'recommended.index' %}">Recommendations</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'jobmap.index' %}">Job Map</a></li>
                             </ul>
                         </li>
                     {% endif %}
+
+                    <!-- Job Map link aligned as a nav-item -->
+                    <li class="nav-item">
+                        <a class="nav-link text-primary" href="{% url 'jobmap.index' %}">Job Map</a>
+                    </li>
+
                     {% if request.user.is_authenticated and request.user.is_recruiter %}
                         <a href="{% url 'recommended.candidate_search' %}" class="btn btn-primary ms-2">Candidates</a>
                         <a href="{% url 'post_job' %}" class="btn btn-primary ms-2">Post Job</a>
@@ -365,6 +369,7 @@
                         <a href="{% url 'jobs.index' %}" class="btn btn-primary ms-2">Jobs</a>
                     {% endif %}
                 </ul>
+
 
                 {% if user.is_authenticated %}
                     {% if user.is_recruiter %}

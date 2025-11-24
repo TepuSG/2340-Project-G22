@@ -64,4 +64,5 @@ logs/
 # Keep project-specific exceptions here
 # For example: !/some-folder/keep_me
 
-.env
+.envdb.sqlite3
+db.sqlite3
