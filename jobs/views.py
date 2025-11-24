@@ -16,7 +16,7 @@ from django.contrib.auth import get_user_model
 def available_jobs(request):
     # Reuse the home.index template rendering pattern
 
-    if request.user.is_recruiter:
+    if request.user.is_authenticated and request.user.is_recruiter:
         print("recruiter here ")
         return recruiter_jobs(request)
 
