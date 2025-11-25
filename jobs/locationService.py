@@ -9,7 +9,7 @@ class LocationService:
     def get_location(self, value):
 
         response = requests.get(
-            self.url, params=self.get_params(value, 1), headers=self.headers
+            self.url, params=self.get_params(value, 1), headers=self.headers, timeout=5
         )
 
         # Parse JSON
@@ -26,7 +26,7 @@ class LocationService:
 
     def get_best_locations(self, value):
         response = requests.get(
-            self.url, params=self.get_params(value, 5), headers=self.headers
+            self.url, params=self.get_params(value, 5), headers=self.headers, timeout=5
         )
 
         json_data = response.json()

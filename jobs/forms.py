@@ -86,11 +86,16 @@ class JobForm(forms.ModelForm):
         location = self.cleaned_data.get("location")
 
         print("new job location is ...", location)
-        validated_data = LocationService().get_location(location)
-        if not validated_data:
-            raise forms.ValidationError(
-                "Invalid Location! Please enter a valid address."
-            )
-
-        # Return the formatted (validated) display name
-        return validated_data[0]["display_name"]
+        
+        # Try to validate location, but don't fail if API is unavailable
+        try:
+            validated_data = LocationService().get_location(location)
+            if validated_data:
+                # Return the formatted (validated) display name
+                return validated_data[0]["display_name"]
+        except Exception as e:
+            # Log the error but don't block the form submission
+            print(f"Location validation unavailable: {e}")
+        
+        # If validation fails or is unavailable, return the original location
+        return location
